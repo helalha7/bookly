@@ -1,5 +1,6 @@
 package com.dev.bookly.user.controllers;
 
+import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
@@ -35,7 +36,7 @@ public class UserAdminController {
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreationRequestDTO userCreationRequestDTO) {
-        System.out.println(userCreationRequestDTO);
+        UserResponseDTO userResponseDTO = userService.createUser(userCreationRequestDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

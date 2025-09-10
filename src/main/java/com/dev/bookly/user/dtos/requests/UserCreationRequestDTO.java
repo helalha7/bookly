@@ -1,6 +1,7 @@
 package com.dev.bookly.user.dtos.requests;
 
 import com.dev.bookly.role.domains.Role;
+import com.dev.bookly.user.domains.User;
 
 import java.util.List;
 

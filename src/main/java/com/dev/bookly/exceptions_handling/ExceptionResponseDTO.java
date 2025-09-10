@@ -3,6 +3,7 @@ package com.dev.bookly.exceptions_handling;
 import java.time.LocalDateTime;
 
 public class ExceptionResponseDTO {
+
     private final String message;
     private final String error;
     private final int status;

@@ -63,11 +63,12 @@ public class UserRepositoryMySQLImpl implements UserRepository {
                             List<Role> roles = new ArrayList<>();
                             Account account = new Account(
                                     rs.getLong("account_id"),
+                                    rs.getLong("user_id"),
                                     rs.getString("username"),
                                     rs.getString("password"),
-                                    rs.getBoolean("is_active"),
-                                    rs.getString("phone_number"),
                                     rs.getString("email"),
+                                    rs.getString("phone_number"),
+                                    rs.getBoolean("is_active"),
                                     roles
                             );
                             user = new User(
@@ -129,11 +130,12 @@ public class UserRepositoryMySQLImpl implements UserRepository {
                             List<Role> roles = new ArrayList<>();
                             Account account = new Account(
                                     rs.getLong("account_id"),
+                                    rs.getLong("user_id"),
                                     rs.getString("username"),
                                     rs.getString("password"),
-                                    rs.getBoolean("is_active"),
-                                    rs.getString("phone_number"),
                                     rs.getString("email"),
+                                    rs.getString("phone_number"),
+                                    rs.getBoolean("is_active"),
                                     roles
                             );
                             newUser = new User(
@@ -160,12 +162,42 @@ public class UserRepositoryMySQLImpl implements UserRepository {
     }
 
     @Override
-    public User getUserById(Long userId) {
-        return null;
+    public User createUser(User user) {
+        String query = """
+                INSERT INTO users (first_name, last_name, city, street, house_number)
+                VALUES(?,?,?,?,?);
+        """;
+        jdbcTemplate.update(
+                query,
+                user.getFirstName(),
+                user.getLastName(),
+                user.getCity(),
+                user.getStreet(),
+                user.getHouseNumber()
+        );
+        return user;
     }
 
     @Override
-    public User createUser(UserCreationRequestDTO userCreationDTO) {
+    public Account createAccount(Account account) {
+        String query = """
+                INSERT INTO accounts (user_id, email, phone_number, username, password, is_active)
+                VALUES (?,?,?,?,?,?)
+        """;
+        jdbcTemplate.update(
+                query,
+                account.getUserId(),
+                account.getEmail(),
+                account.getPhoneNumber(),
+                account.getUsername(),
+                account.getPassword(),
+                account.getActiveStatus()
+        );
+        return account;
+    }
+
+    @Override
+    public User getUserById(Long userId) {
         return null;
     }
 

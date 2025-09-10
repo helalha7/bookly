@@ -1,6 +1,7 @@
 package com.dev.bookly.user.services.impl;
 
 import com.dev.bookly.user.domains.User;
+import com.dev.bookly.user.dtos.UserMapper;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
@@ -9,6 +10,7 @@ import com.dev.bookly.user.exceptions.UserNotFoundException;
 import com.dev.bookly.user.repositories.UserRepository;
 import com.dev.bookly.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,10 +19,12 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -28,7 +32,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.getAllUsers();
         List<UserResponseDTO> usersDTO = new ArrayList<>();
         for(User user : users) {
-            UserResponseDTO userResponseDTO = new UserResponseDTO(user);
+            UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(user);
             usersDTO.add(userResponseDTO);
         }
         return usersDTO;
@@ -40,13 +44,18 @@ public class UserServiceImpl implements UserService {
         if(user == null) {
             throw new UserNotFoundException("User with username " + username + " not found!");
         }
-        UserResponseDTO userResponseDTO = new UserResponseDTO(user);
+        UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(user);
         return userResponseDTO;
     }
 
     @Override
     public UserResponseDTO createUser(UserCreationRequestDTO userCreationDTO) {
-        return null;
+        User user = UserMapper.toUser(userCreationDTO);
+        String encryptedPassword = passwordEncoder.encode(user.getAccount().getPassword());
+        user.getAccount().setPassword(encryptedPassword);
+        User newUser = userRepository.createUser(user);
+        UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(newUser);
+        return userResponseDTO;
     }
 
     @Override

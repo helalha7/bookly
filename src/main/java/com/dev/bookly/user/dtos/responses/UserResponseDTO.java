@@ -1,7 +1,6 @@
 package com.dev.bookly.user.dtos.responses;
 
 import com.dev.bookly.role.domains.Role;
-import com.dev.bookly.user.domains.User;
 
 import java.util.List;
 
@@ -39,19 +38,6 @@ public class UserResponseDTO {
         this.city = city;
         this.street = street;
         this.houseNumber = houseNumber;
-    }
-
-    public UserResponseDTO(User user) {
-        this.id = user.getId();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.username = user.getAccount().getUsername();
-        this.phoneNumber = user.getAccount().getPhoneNumber();
-        this.email = user.getAccount().getEmail();
-        this.roles = user.getAccount().getRoles();
-        this.city = user.getCity();
-        this.street = user.getStreet();
-        this.houseNumber = user.getHouseNumber();
     }
 
     public Long getId() {

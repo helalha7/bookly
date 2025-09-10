@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Account {
     private Long id;
+    private Long userId;
     private String username;
     private String password;
     private String email;
@@ -17,13 +18,14 @@ public class Account {
 
     }
 
-    public Account(Long id, String username, String password, boolean activeStatus, String phoneNumber, String email, List<Role> roles) {
+    public Account(Long id, Long userId, String username, String password, String email, String phoneNumber, boolean activeStatus, List<Role> roles) {
         this.id = id;
+        this.userId = userId;
         this.username = username;
         this.password = password;
-        this.activeStatus = activeStatus;
-        this.phoneNumber = phoneNumber;
         this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.activeStatus = activeStatus;
         this.roles = roles;
     }
 
@@ -67,7 +69,7 @@ public class Account {
         this.phoneNumber = phoneNumber;
     }
 
-    public boolean isActiveStatus() {
+    public boolean getActiveStatus() {
         return activeStatus;
     }
 
@@ -81,6 +83,14 @@ public class Account {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }
 
