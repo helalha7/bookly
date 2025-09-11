@@ -1,5 +1,6 @@
 package com.dev.bookly.user.controllers;
 
+import com.dev.bookly.security.services.UserDetailsImpl;
 import com.dev.bookly.user.dtos.requests.UserChangePasswordRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
@@ -28,6 +29,7 @@ public class UserMeController {
         UserResponseDTO userResponseDTO = userService.getUserByUsername(
                 userDetails.getUsername()
         );
+        System.out.println(((UserDetailsImpl) userDetails).getId());
         return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
     }
 

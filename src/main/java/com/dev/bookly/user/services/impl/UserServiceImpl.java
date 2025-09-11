@@ -1,5 +1,7 @@
 package com.dev.bookly.user.services.impl;
 
+import com.dev.bookly.role.domains.Role;
+import com.dev.bookly.role.repositories.RoleRepository;
 import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.UserMapper;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
@@ -12,6 +14,7 @@ import com.dev.bookly.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +22,13 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
+    private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -49,10 +54,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponseDTO createUser(UserCreationRequestDTO userCreationDTO) {
+
+        //mapping dtos to domains
         User user = UserMapper.toUser(userCreationDTO);
+
+        //hashing password
         String encryptedPassword = passwordEncoder.encode(user.getAccount().getPassword());
         user.getAccount().setPassword(encryptedPassword);
+
+        List<Role> roles = user.getAccount().getRoles();
+
         User newUser = userRepository.createUser(user);
         UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(newUser);
         return userResponseDTO;

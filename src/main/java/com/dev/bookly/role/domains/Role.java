@@ -1,13 +1,13 @@
 package com.dev.bookly.role.domains;
 
 public class Role {
-    private int id;
+    private Integer id;
     private String role;
 
     public Role() {
     }
 
-    public Role(int id, String role) {
+    public Role(Integer id, String role) {
         this.id = id;
         this.role = role;
     }

@@ -1,6 +1,7 @@
 package com.dev.bookly.user.dtos.requests;
 
 import com.dev.bookly.role.domains.Role;
+import com.dev.bookly.role.dtos.RoleDTO;
 import com.dev.bookly.user.domains.User;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class UserCreationRequestDTO {
     private final String city;
     private final String street;
     private final int houseNumber;
-    private final List<String> roles;
+    private final List<RoleDTO> roles;
 
     public UserCreationRequestDTO(
             String firstName,
@@ -28,7 +29,7 @@ public class UserCreationRequestDTO {
             String city,
             String street,
             int houseNumber,
-            List<String> roles
+            List<RoleDTO> roles
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -46,6 +47,10 @@ public class UserCreationRequestDTO {
         return firstName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getLastName() {
         return lastName;
     }
@@ -54,47 +59,27 @@ public class UserCreationRequestDTO {
         return username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public int getHouseNumber() {
-        return houseNumber;
+    public String getEmail() {
+        return email;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public String getCity() {
         return city;
     }
 
-    @Override
-    public String toString() {
-        return "UserCreationRequestDTO{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", city='" + city + '\'' +
-                ", street='" + street + '\'' +
-                ", houseNumber=" + houseNumber +
-                ", roles=" + roles +
-                '}';
+    public String getStreet() {
+        return street;
+    }
+
+    public List<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public int getHouseNumber() {
+        return houseNumber;
     }
 }

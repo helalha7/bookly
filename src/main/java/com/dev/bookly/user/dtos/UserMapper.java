@@ -1,6 +1,8 @@
 package com.dev.bookly.user.dtos;
 
 import com.dev.bookly.role.domains.Role;
+import com.dev.bookly.role.dtos.RoleDTO;
+import com.dev.bookly.role.dtos.RoleMapper;
 import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
@@ -13,9 +15,9 @@ public class UserMapper {
 
     public static User toUser(UserCreationRequestDTO dto) {
         List<Role> roles = new ArrayList<>();
-        for(String role : dto.getRoles()) {
-            Role r = new Role(0,role);
-            roles.add(r);
+        for(RoleDTO roleDTO : dto.getRoles()) {
+            Role role = RoleMapper.toRole(roleDTO);
+            roles.add(role);
         }
         Account account = new Account(
                 null,
@@ -41,6 +43,10 @@ public class UserMapper {
 
     public static UserResponseDTO toUserResponseDTO(User user) {
         Account account = user.getAccount();
+        List<RoleDTO> roleDTOs = new ArrayList<>();
+        for(Role role : user.getAccount().getRoles()) {
+            roleDTOs.add(RoleMapper.toRoleDTO(role));
+        }
         UserResponseDTO userResponseDTO = new UserResponseDTO(
                 user.getId(),
                 user.getFirstName(),
@@ -48,7 +54,7 @@ public class UserMapper {
                 account.getUsername(),
                 account.getPhoneNumber(),
                 account.getEmail(),
-                account.getRoles(),
+                roleDTOs,
                 user.getCity(),
                 user.getStreet(),
                 user.getHouseNumber()

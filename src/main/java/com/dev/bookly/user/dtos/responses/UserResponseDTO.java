@@ -1,6 +1,7 @@
 package com.dev.bookly.user.dtos.responses;
 
 import com.dev.bookly.role.domains.Role;
+import com.dev.bookly.role.dtos.RoleDTO;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class UserResponseDTO {
     private final String username;
     private final String phoneNumber;
     private final String email;
-    private final List<Role> roles;
+    private final List<RoleDTO> roles;
     private final String city;
     private final String street;
     private final int houseNumber;
@@ -23,7 +24,7 @@ public class UserResponseDTO {
             String username,
             String phoneNumber,
             String email,
-            List<Role> roles,
+            List<RoleDTO> roles,
             String city,
             String street,
             int houseNumber
@@ -44,16 +45,16 @@ public class UserResponseDTO {
         return id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getUsername() {
+        return username;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFirstName() {
+        return firstName;
     }
 
     public String getEmail() {
@@ -64,7 +65,7 @@ public class UserResponseDTO {
         return phoneNumber;
     }
 
-    public List<Role> getRoles() {
+    public List<RoleDTO> getRoles() {
         return roles;
     }
 
@@ -72,13 +73,11 @@ public class UserResponseDTO {
         return city;
     }
 
-    public String getStreet() {
-        return street;
-    }
-
     public int getHouseNumber() {
         return houseNumber;
     }
 
-
+    public String getStreet() {
+        return street;
+    }
 }
