@@ -31,13 +31,14 @@ public class UserAdminController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        UserResponseDTO userResponseDTO = userService.getUserById(userId);
+        return new ResponseEntity<>(userResponseDTO,HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreationRequestDTO userCreationRequestDTO) {
         UserResponseDTO userResponseDTO = userService.createUser(userCreationRequestDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(userResponseDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{userId}")

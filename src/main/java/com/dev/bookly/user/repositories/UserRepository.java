@@ -1,5 +1,6 @@
 package com.dev.bookly.user.repositories;
 
+import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
@@ -14,6 +15,7 @@ public interface UserRepository {
     User getUserById(Long userId);
     User createUser(User user);
     Account createAccount(Account account);
+    void assignRoles(Long accountId, List<Role> roles);
     void deleteUser(Long userId);
     void updateUserInfo(Long userId, UserUpdateRequestDTO userUpdateDTO);
     void updateUserAccountStatus(Long userId, UserAccountStatusUpdateRequestDTO userAccountStatusUpdateRequestDTO);

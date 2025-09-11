@@ -26,10 +26,7 @@ public class UserMeController {
     public ResponseEntity<UserResponseDTO> getMyInfo(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        UserResponseDTO userResponseDTO = userService.getUserByUsername(
-                userDetails.getUsername()
-        );
-        System.out.println(((UserDetailsImpl) userDetails).getId());
+        UserResponseDTO userResponseDTO = userService.getUserById(((UserDetailsImpl) userDetails).getId());
         return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
     }
 

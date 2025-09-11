@@ -2,6 +2,7 @@ package com.dev.bookly.user.services.impl;
 
 import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.role.repositories.RoleRepository;
+import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.UserMapper;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
@@ -44,16 +45,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO getUserByUsername(String username) {
-        User user = userRepository.getUserByUsername(username);
-        if(user == null) {
-            throw new UserNotFoundException("User with username " + username + " not found!");
-        }
-        UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(user);
-        return userResponseDTO;
-    }
-
-    @Override
     @Transactional
     public UserResponseDTO createUser(UserCreationRequestDTO userCreationDTO) {
 
@@ -66,14 +57,23 @@ public class UserServiceImpl implements UserService {
 
         List<Role> roles = user.getAccount().getRoles();
 
-        User newUser = userRepository.createUser(user);
-        UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(newUser);
+        user = userRepository.createUser(user);
+        user.getAccount().setUserId(user.getId());
+        Account account = userRepository.createAccount(user.getAccount());
+        user.setAccount(account);
+        userRepository.assignRoles(account.getId(), account.getRoles());
+        UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(user);
         return userResponseDTO;
     }
 
     @Override
     public UserResponseDTO getUserById(Long userId) {
-        return null;
+        User user =userRepository.getUserById(userId);
+        if(user == null) {
+            throw new UserNotFoundException("User with id : " + userId + " not found!");
+        }
+        UserResponseDTO userResponseDTO = UserMapper.toUserResponseDTO(user);
+        return userResponseDTO;
     }
 
     @Override

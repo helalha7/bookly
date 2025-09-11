@@ -175,6 +175,8 @@ public class UserRepositoryMySQLImpl implements UserRepository {
                 user.getStreet(),
                 user.getHouseNumber()
         );
+        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        user.setId(id);
         return user;
     }
 
@@ -193,13 +195,96 @@ public class UserRepositoryMySQLImpl implements UserRepository {
                 account.getPassword(),
                 account.getActiveStatus()
         );
+
+        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        account.setId(id);
         return account;
     }
 
     @Override
-    public User getUserById(Long userId) {
-        return null;
+    public void assignRoles(Long accountId, List<Role> roles) {
+        String query =
+        """
+            INSERT INTO assigned_roles (account_id, role_id) VALUES(?,?);
+        """;
+        for(Role role : roles) {
+            jdbcTemplate.update(
+                    query,
+                    accountId,
+                    role.getId()
+            );
+        }
     }
+
+    @Override
+    public User getUserById(Long userId) {
+        String query = """
+        SELECT u.id AS user_id,
+               u.first_name,
+               u.last_name,
+               u.city,
+               u.street,
+               u.house_number,
+               a.id AS account_id,
+               a.email,
+               a.phone_number,
+               a.username,
+               a.password,
+               a.is_active,
+               ar.role_id,
+               r.role
+        FROM users AS u
+        LEFT JOIN accounts AS a
+               ON u.id = a.user_id
+        LEFT JOIN assigned_roles AS ar
+               ON a.id = ar.account_id
+        LEFT JOIN roles AS r
+               ON ar.role_id = r.id
+        WHERE u.id = ?
+        """;
+        User user = jdbcTemplate.query(
+                query,
+                (rs) -> {
+                    User newUser = null;
+                    while(rs.next()){
+                        if(newUser == null) {
+                            List<Role> roles = new ArrayList<>();
+                            Account account = new Account(
+                                    rs.getLong("account_id"),
+                                    rs.getLong("user_id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    rs.getString("email"),
+                                    rs.getString("phone_number"),
+                                    rs.getBoolean("is_active"),
+                                    roles
+                            );
+                            newUser = new User(
+                                    rs.getLong("user_id"),
+                                    rs.getString("first_name"),
+                                    rs.getString("last_name"),
+                                    rs.getString("city"),
+                                    rs.getInt("house_number"),
+                                    rs.getString("street"),
+                                    account
+                            );
+                        }
+                        Role role = new Role(
+                                rs.getInt("role_id"),
+                                rs.getString("role")
+                        );
+                        newUser.getAccount().getRoles().add(role);
+                    }
+                    return newUser;
+                },
+                userId
+        );
+        return user;
+    }
+
+
+
+
 
     @Override
     public void deleteUser(Long userId) {
