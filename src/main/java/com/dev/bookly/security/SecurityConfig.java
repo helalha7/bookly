@@ -21,11 +21,11 @@ public class SecurityConfig {
                 .csrf((csrf)->csrf.disable())
                 .authorizeHttpRequests(
                         (authorize) -> authorize
-                                .requestMatchers("/api/me/**").hasAuthority("TENANT")
-                                .requestMatchers("/api/users/**").hasAuthority("ADMIN")
+                                //.requestMatchers("/api/me/**").hasAuthority("TENANT")
+                                //.requestMatchers("/api/users/**").hasAuthority("ADMIN")
                                 .anyRequest().permitAll()
                 )
-                .httpBasic(Customizer.withDefaults())
+                //.httpBasic(Customizer.withDefaults())
                 .build();
     }
 
