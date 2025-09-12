@@ -4,6 +4,9 @@ import com.dev.bookly.businessProfile.domains.Business;
 import com.dev.bookly.businessProfile.dtos.BusinessMapper;
 import com.dev.bookly.businessProfile.dtos.request.BusinessRequestDTO;
 import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTO;
+import com.dev.bookly.businessProfile.exceptions.BusinessAlreadyExistsException;
+import com.dev.bookly.businessProfile.exceptions.BusinessEmptyException;
+import com.dev.bookly.businessProfile.exceptions.BusinessNotFoundException;
 import com.dev.bookly.businessProfile.repostries.BusinessRepository;
 import com.dev.bookly.businessProfile.repostries.impl.BusinessRepositoryMysqlImpl;
 import com.dev.bookly.businessProfile.services.BusinessService;
@@ -26,15 +29,17 @@ public class BusinessServiceImpl implements BusinessService {
      }
 
 
-//    @Override
-//    public BusinessResponseDTO get(Long userId,Long businessId) {
-//        Business business = businessRepository.findById(userId,businessId);
-//
-//        BusinessResponseDTO responseDTO = BusinessMapper.toResponseDTO(business);
-//
-//        return responseDTO;
-//
-//    }
+    @Override
+    public BusinessResponseDTO get(Long businessId) {
+        Business business = businessRepository.findById(businessId);
+
+        BusinessResponseDTO responseDTO = BusinessMapper.toResponseDTO(business);
+
+
+
+        return responseDTO;
+
+    }
 
 
     @Override
@@ -46,6 +51,9 @@ public class BusinessServiceImpl implements BusinessService {
             BusinessResponseDTO businessResponseDTO = BusinessMapper.toResponseDTO(business);
             businessResponseDTOS.add(businessResponseDTO);
          }
+         if (businessResponseDTOS.isEmpty()) {
+             throw new BusinessEmptyException("the user with id " + userId + " don't have any businesses");
+         }
          return businessResponseDTOS;
 
     }
@@ -54,7 +62,7 @@ public class BusinessServiceImpl implements BusinessService {
     public BusinessResponseDTO create(BusinessRequestDTO businessRequestDTO, Long userId) {
         List<Business> businesses = businessRepository.findAll(userId);
         if (!businesses.isEmpty()) {
-            throw new IllegalStateException("User already has a business");
+            throw new BusinessAlreadyExistsException("User already has a business with name: " + businessRequestDTO.getName());
         }
 
         Business toSave = BusinessMapper.toBusiness(businessRequestDTO,userId);
@@ -68,9 +76,9 @@ public class BusinessServiceImpl implements BusinessService {
 
     @Override
     public BusinessResponseDTO update(Long id,BusinessRequestDTO businessRequestDTO, Long userId) {
-        List<Business> businesses = businessRepository.findAll(userId);
-        if (businesses.isEmpty()) {
-            throw new IllegalStateException("User Not has a business");
+       Business businesses = businessRepository.findById(id);
+        if (businesses == null) {
+            throw new BusinessNotFoundException("There is no business to user with id: " + id );
         }
         Business toUpdate = BusinessMapper.toBusiness(businessRequestDTO,userId,id);
 
@@ -87,6 +95,16 @@ public class BusinessServiceImpl implements BusinessService {
 
 
          return businessResponseDTO;
+    }
+
+    @Override
+    public Long delete(Long id) {
+         Business business = businessRepository.findById(id);
+         if(business==null){
+             throw new BusinessNotFoundException("There is no business with id: " + id);
+         }
+         Long toDelete = businessRepository.delete(id);
+        return toDelete;
     }
 
 

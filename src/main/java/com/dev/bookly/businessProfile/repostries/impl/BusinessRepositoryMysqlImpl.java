@@ -1,7 +1,7 @@
 package com.dev.bookly.businessProfile.repostries.impl;
 
 import com.dev.bookly.businessProfile.domains.Business;
-import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTO;
+import com.dev.bookly.businessProfile.exceptions.BusinessNotFoundException;
 import com.dev.bookly.businessProfile.repostries.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
@@ -23,28 +22,32 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
     }
 
 
-//    @Override
-//    public Business findById(Long userId, Long businessId) {
-//        String sql = "SELECT * FROM businesses WHERE user_id=? AND id=?";
-//        List<Business> list = jdbcTemplate.query(
-//                sql,
-//                (rs, rowNum) -> new Business(
-//                        rs.getLong("id"),
-//                        rs.getLong("user_id"),
-//                        rs.getString("name"),
-//                        rs.getString("address"),
-//                        rs.getString("logo_url"),
-//                        rs.getString("description"),
-//                        rs.getString("timezone"),
-//                        rs.getBoolean("active"),
-//                        rs.getDate("created_at"),
-//                        rs.getDate("updated_at")
-//                ),
-//                userId, businessId
-//        );
-//
-//        return list.isEmpty() ? null : list.get(0);
-//    }
+    @Override
+    public Business findById(Long businessId) {
+        String sql = "SELECT * FROM businesses WHERE id=?";
+
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    (rs, rowNum) -> new Business(
+                            rs.getLong("id"),
+                            rs.getLong("user_id"),
+                            rs.getString("name"),
+                            rs.getString("address"),
+                            rs.getString("logo_url"),
+                            rs.getString("description"),
+                            rs.getString("timezone"),
+                            rs.getBoolean("active"),
+                            rs.getDate("created_at"),
+                            rs.getDate("updated_at")
+                    ),
+                    businessId
+            );
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            throw new BusinessNotFoundException("Business with id " + businessId + " not found");
+        }
+    }
+
 
     @Override
     public Business save(Business b) {
@@ -115,7 +118,7 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
                description = ?,
                timezone = ?,
                active = ?
-         WHERE id = ? AND user_id = ?
+         WHERE id = ?
         """;
 
         int rows = jdbcTemplate.update(sql,
@@ -125,12 +128,12 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
                 b.getDescription(),
                 b.getTimeZone(),
                 b.isActive(),
-                b.getId(),
-                b.getUserId()
+                b.getId()
+
         );
 
         if (rows == 0) {
-            throw new IllegalStateException("Business not found or not owned by user");
+            throw new BusinessNotFoundException("The business with id " + b.getId() + " not found");
         }
 
 
@@ -160,7 +163,7 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
 
         int rows = jdbcTemplate.update(sql, active, userId, id);
         if (rows == 0) {
-            throw new IllegalStateException("Business not found or not owned by user");
+            throw new BusinessNotFoundException("the business with id " + id + " not found");
         }
 
         return jdbcTemplate.queryForObject(
@@ -182,6 +185,17 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
 
 
 
+    }
+
+    @Override
+    public Long delete(Long id){
+        String sql = "DELETE FROM businesses WHERE id = ?";
+        int rows = jdbcTemplate.update(sql, id);
+        if (rows == 0) {
+            throw new BusinessNotFoundException("the business with id " + id + " not found");
+        }
+
+        return id;
     }
 
 
