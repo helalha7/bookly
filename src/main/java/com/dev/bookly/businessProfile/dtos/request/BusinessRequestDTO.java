@@ -1,11 +1,15 @@
 package com.dev.bookly.businessProfile.dtos.request;
 
+import java.util.Date;
+
 public class BusinessRequestDTO {
     private final String name;
     private final String address;
     private final String logoUrl;
     private final String description;
     private final String timeZone;
+
+
 
 
     public BusinessRequestDTO(String name, String address, String logoUrl, String description, String timeZone) {

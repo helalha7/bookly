@@ -2,6 +2,7 @@ package com.dev.bookly.businessProfile.domains;
 
 
 import java.time.Instant;
+import java.util.Date;
 
 public class Business {
 
@@ -13,10 +14,10 @@ public class Business {
     private String description;
     private String timeZone;
     private boolean active;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
 
-    public Business(Long id, Long userId, String name, String address, String logoUrl, String description, String timeZone, boolean active, Instant createdAt, Instant updatedAt) {
+    public Business(Long id, Long userId, String name, String address, String logoUrl, String description, String timeZone, boolean active, Date createdAt, Date updatedAt) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -61,11 +62,11 @@ public class Business {
         this.active = active;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -101,11 +102,11 @@ public class Business {
         return active;
     }
 
-    public Instant getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 }

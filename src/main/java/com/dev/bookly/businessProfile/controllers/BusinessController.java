@@ -3,7 +3,9 @@ package com.dev.bookly.businessProfile.controllers;
 import com.dev.bookly.businessProfile.dtos.request.BusinessRequestDTO;
 import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTO;
 import com.dev.bookly.businessProfile.services.impl.BusinessServiceImpl;
+import com.dev.bookly.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,33 +24,51 @@ public class BusinessController {
         this.businessServiceImpl = businessServiceImpl;
     }
 
+
+    // get all businesses
     @GetMapping
     public ResponseEntity<List<BusinessResponseDTO>> getAllBusiness(@AuthenticationPrincipal UserDetails userDetails){
-        BusinessResponseDTO businessResponseDTO;
-        businessServiceImpl.get(userDetails.getUsername());
-)
+
+        List<BusinessResponseDTO> businessResponseDTOS = businessServiceImpl.getAll(((UserDetailsImpl) userDetails).getId());
+
+        return new ResponseEntity<>(businessResponseDTOS, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BusinessResponseDTO> getBusinessById(@PathVariable Long id){
 
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<BusinessResponseDTO> getBusinessById(@PathVariable Long businessId,@AuthenticationPrincipal UserDetails userDetails){
+//
+//        BusinessResponseDTO businessResponseDTO = businessServiceImpl.get(((UserDetailsImpl) userDetails).getId(),businessId);
+//
+//        return new ResponseEntity<>(businessResponseDTO, HttpStatus.OK);
+//    }
+
 
     @PostMapping
-    public ResponseEntity<BusinessResponseDTO> create(@RequestBody BusinessRequestDTO businessRequestDTO){
+    public ResponseEntity<BusinessResponseDTO> create(@RequestBody BusinessRequestDTO businessRequestDTO, @AuthenticationPrincipal UserDetails userDetails){
 
+        BusinessResponseDTO responseDTO = businessServiceImpl.create(businessRequestDTO, ((UserDetailsImpl) userDetails).getId());
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
     }
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<BusinessResponseDTO> update(@PathVariable Long id, @RequestBody BusinessRequestDTO businessRequestDTO){
+    public ResponseEntity<BusinessResponseDTO> update(@PathVariable Long id, @RequestBody BusinessRequestDTO businessRequestDTO, @AuthenticationPrincipal UserDetails userDetails){
 
+        BusinessResponseDTO responseDTO =  businessServiceImpl.update(id, businessRequestDTO, ((UserDetailsImpl) userDetails).getId());
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/status")
-    public ResponseEntity<BusinessResponseDTO> status(@PathVariable Long id,@RequestBody boolean active){
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<BusinessResponseDTO> status(@PathVariable Long id,@RequestParam("active")  Boolean active, @AuthenticationPrincipal UserDetails userDetails){
+        BusinessResponseDTO responseDTO = businessServiceImpl.status(id, active, ((UserDetailsImpl) userDetails).getId());
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+
 
 
 }
