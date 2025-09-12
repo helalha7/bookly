@@ -23,7 +23,7 @@ public class SecurityConfig {
                         (authorize) -> authorize
                                 .requestMatchers("/api/me/**").hasAuthority("TENANT")
                                 .requestMatchers("/api/users/**").hasAuthority("ADMIN")
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .build();
