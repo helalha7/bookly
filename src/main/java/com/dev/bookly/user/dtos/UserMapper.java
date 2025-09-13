@@ -6,6 +6,7 @@ import com.dev.bookly.role.dtos.RoleMapper;
 import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
+import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 
 import java.util.ArrayList;
@@ -22,13 +23,37 @@ public class UserMapper {
         Account account = new Account(
                 null,
                 null,
-                dto.getUsername(),
-                dto.getPassword(),
-                dto.getEmail(),
-                dto.getPhoneNumber(),
+                dto.getUsername().trim(),
+                dto.getPassword().trim(),
+                dto.getEmail().trim(),
+                dto.getPhoneNumber().trim(),
                 true,
                 roles
         );
+        User user = new User(
+                null,
+                dto.getFirstName().trim(),
+                dto.getLastName().trim(),
+                dto.getCity().trim(),
+                dto.getHouseNumber(),
+                dto.getStreet().trim(),
+                account
+        );
+        return user;
+    }
+
+    public static User toUser(UserUpdateRequestDTO dto) {
+        Account account = new Account(
+                null,
+                null,
+                null,
+                null,
+                dto.getEmail(),
+                dto.getPhoneNumber(),
+                null,
+                null
+        );
+
         User user = new User(
                 null,
                 dto.getFirstName(),
@@ -38,6 +63,7 @@ public class UserMapper {
                 dto.getStreet(),
                 account
         );
+
         return user;
     }
 
@@ -61,4 +87,5 @@ public class UserMapper {
         );
         return userResponseDTO;
     }
+
 }

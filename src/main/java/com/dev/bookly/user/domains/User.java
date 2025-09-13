@@ -7,13 +7,13 @@ public class User {
     private String lastName;
     private String city;
     private String street;
-    private int houseNumber;
+    private Integer houseNumber;
     private Account account;
 
     public User() {
     }
 
-    public User(Long id, String firstName, String lastName, String city, int houseNumber, String street, Account account) {
+    public User(Long id, String firstName, String lastName, String city, Integer houseNumber, String street, Account account) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -63,11 +63,11 @@ public class User {
         this.street = street;
     }
 
-    public int getHouseNumber() {
+    public Integer getHouseNumber() {
         return houseNumber;
     }
 
-    public void setHouseNumber(int houseNumber) {
+    public void setHouseNumber(Integer houseNumber) {
         this.houseNumber = houseNumber;
     }
 

@@ -7,7 +7,7 @@ public class UserUpdateRequestDTO {
     private final String phoneNumber;
     private final String city;
     private final String street;
-    private final int houseNumber;
+    private final Integer houseNumber;
 
     public UserUpdateRequestDTO(
             String firstName,
@@ -16,7 +16,7 @@ public class UserUpdateRequestDTO {
             String phoneNumber,
             String city,
             String street,
-            int houseNumber
+            Integer houseNumber
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -47,7 +47,7 @@ public class UserUpdateRequestDTO {
         return email;
     }
 
-    public int getHouseNumber() {
+    public Integer getHouseNumber() {
         return houseNumber;
     }
 

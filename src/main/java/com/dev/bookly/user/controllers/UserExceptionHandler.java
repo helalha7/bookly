@@ -1,6 +1,8 @@
 package com.dev.bookly.user.controllers;
 
 import com.dev.bookly.global.ExceptionResponseDTO;
+import com.dev.bookly.user.exceptions.UserAlreadyExistsException;
+import com.dev.bookly.user.exceptions.UserInvalidDataException;
 import com.dev.bookly.user.exceptions.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -28,5 +30,38 @@ public class UserExceptionHandler {
         );
 
         return new ResponseEntity<>(exceptionResponseDTO, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponseDTO> handleUserInvalidDataException(
+            UserInvalidDataException userInvalidDataException,
+            HttpServletRequest request
+    ) {
+        ExceptionResponseDTO exceptionResponseDTO = new ExceptionResponseDTO(
+                userInvalidDataException.getMessage(),
+                "USER_INVALID_INPUT",
+                request.getMethod(),
+                400,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(exceptionResponseDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponseDTO> handleUserAlreadyExistsException(
+            UserAlreadyExistsException userAlreadyExistsException,
+            HttpServletRequest request
+    ) {
+        ExceptionResponseDTO exceptionResponseDTO = new ExceptionResponseDTO(
+                userAlreadyExistsException.getMessage(),
+                "USER_ALREADY_EXISTS",
+                request.getMethod(),
+                400,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(exceptionResponseDTO, HttpStatus.BAD_REQUEST);
     }
 }

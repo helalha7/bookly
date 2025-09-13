@@ -16,7 +16,7 @@ public class UserCreationRequestDTO {
     private final String phoneNumber;
     private final String city;
     private final String street;
-    private final int houseNumber;
+    private final Integer houseNumber;
     private final List<RoleDTO> roles;
 
     public UserCreationRequestDTO(
@@ -28,7 +28,7 @@ public class UserCreationRequestDTO {
             String phoneNumber,
             String city,
             String street,
-            int houseNumber,
+            Integer houseNumber,
             List<RoleDTO> roles
     ) {
         this.firstName = firstName;
@@ -79,7 +79,7 @@ public class UserCreationRequestDTO {
         return roles;
     }
 
-    public int getHouseNumber() {
+    public Integer getHouseNumber() {
         return houseNumber;
     }
 }

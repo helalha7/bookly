@@ -31,10 +31,11 @@ public class UserMeController {
     }
 
     @PutMapping
-    public ResponseEntity<UserResponseDTO> updateMyInfo(
+    public ResponseEntity<Void> updateMyInfo(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserUpdateRequestDTO userUpdateRequestDTO
     ) {
+        userService.updateUserInfo(((UserDetailsImpl) userDetails).getId(), userUpdateRequestDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

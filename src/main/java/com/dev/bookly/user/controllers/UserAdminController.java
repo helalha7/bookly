@@ -1,6 +1,5 @@
 package com.dev.bookly.user.controllers;
 
-import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
@@ -16,12 +15,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 public class UserAdminController {
+
+
     private UserService userService;
 
     @Autowired
-    public UserAdminController(UserService userService) {
+    public UserAdminController(UserService userService)  {
         this.userService = userService;
     }
+
+
+
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
@@ -29,11 +33,15 @@ public class UserAdminController {
         return new ResponseEntity<>(users,HttpStatus.OK);
     }
 
+
+
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
         UserResponseDTO userResponseDTO = userService.getUserById(userId);
         return new ResponseEntity<>(userResponseDTO,HttpStatus.OK);
     }
+
+
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreationRequestDTO userCreationRequestDTO) {
@@ -41,23 +49,39 @@ public class UserAdminController {
         return new ResponseEntity<>(userResponseDTO, HttpStatus.CREATED);
     }
 
+
+
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+
+
     @PutMapping("/{userId}")
-    public ResponseEntity<UserResponseDTO> updateUserInfo(@PathVariable Long userId, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+    public ResponseEntity<Void> updateUserInfo(@PathVariable Long userId, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        userService.updateUserInfo(userId, userUpdateRequestDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+
 
     @PutMapping("/{userId}/status")
     public ResponseEntity<Void> updateUserAccountStatus(@PathVariable Long userId, @RequestBody UserAccountStatusUpdateRequestDTO userAccountStatusUpdateRequestDTO) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+
+
     @PostMapping("/{userId}/password-reset")
     public ResponseEntity<Void> triggerPasswordReset(@PathVariable Long userId) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+
 }
