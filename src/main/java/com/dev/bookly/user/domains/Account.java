@@ -11,14 +11,14 @@ public class Account {
     private String password;
     private String email;
     private String phoneNumber;
-    private boolean activeStatus;
+    private Boolean activeStatus;
     private List<Role> roles;
 
     public Account() {
 
     }
 
-    public Account(Long id, Long userId, String username, String password, String email, String phoneNumber, boolean activeStatus, List<Role> roles) {
+    public Account(Long id, Long userId, String username, String password, String email, String phoneNumber, Boolean activeStatus, List<Role> roles) {
         this.id = id;
         this.userId = userId;
         this.username = username;
@@ -69,11 +69,11 @@ public class Account {
         this.phoneNumber = phoneNumber;
     }
 
-    public boolean getActiveStatus() {
+    public Boolean getActiveStatus() {
         return activeStatus;
     }
 
-    public void setActiveStatus(boolean activeStatus) {
+    public void setActiveStatus(Boolean activeStatus) {
         this.activeStatus = activeStatus;
     }
 
