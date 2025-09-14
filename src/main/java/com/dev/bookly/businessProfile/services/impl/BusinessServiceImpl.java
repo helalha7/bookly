@@ -4,6 +4,7 @@ import com.dev.bookly.businessProfile.domains.Business;
 import com.dev.bookly.businessProfile.dtos.BusinessMapper;
 import com.dev.bookly.businessProfile.dtos.request.BusinessRequestDTO;
 import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTO;
+import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTOAdmin;
 import com.dev.bookly.businessProfile.exceptions.BusinessAlreadyExistsException;
 import com.dev.bookly.businessProfile.exceptions.BusinessEmptyException;
 import com.dev.bookly.businessProfile.exceptions.BusinessNotFoundException;
@@ -34,8 +35,6 @@ public class BusinessServiceImpl implements BusinessService {
         Business business = businessRepository.findById(businessId);
 
         BusinessResponseDTO responseDTO = BusinessMapper.toResponseDTO(business);
-
-
 
         return responseDTO;
 
@@ -105,6 +104,25 @@ public class BusinessServiceImpl implements BusinessService {
          }
          Long toDelete = businessRepository.delete(id);
         return toDelete;
+    }
+
+    @Override
+    public List<BusinessResponseDTOAdmin> getAllUsersBusinesses() {
+         List<BusinessResponseDTOAdmin>  businessResponseDTOS = new ArrayList<>();
+         List<Business> businesses = businessRepository.getAllUsersBusinesses();
+         for (Business business : businesses) {
+             BusinessResponseDTOAdmin businessResponseDTO = BusinessMapper.toResponseDTOAdmin(business);
+             businessResponseDTOS.add(businessResponseDTO);
+         }
+        return businessResponseDTOS;
+    }
+
+    @Override
+    public BusinessResponseDTOAdmin getBusinessByUserId(Long userId) {
+
+         BusinessResponseDTOAdmin businessResponseDTOAdmin = BusinessMapper.toResponseDTOAdmin(businessRepository.getBusinessByUserId(userId));
+
+        return businessResponseDTOAdmin;
     }
 
 

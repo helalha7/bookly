@@ -1,6 +1,7 @@
 package com.dev.bookly.businessProfile.repostries.impl;
 
 import com.dev.bookly.businessProfile.domains.Business;
+import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTOAdmin;
 import com.dev.bookly.businessProfile.exceptions.BusinessNotFoundException;
 import com.dev.bookly.businessProfile.repostries.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +188,8 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
 
     }
 
+
+
     @Override
     public Long delete(Long id){
         String sql = "DELETE FROM businesses WHERE id = ?";
@@ -196,6 +199,60 @@ public class BusinessRepositoryMysqlImpl  implements BusinessRepository {
         }
 
         return id;
+    }
+
+    @Override
+    public List<Business> getAllUsersBusinesses() {
+
+        String query = "select * from businesses";
+        List<Business> businesses = jdbcTemplate.query(query,
+                (rs, rowNum) -> new Business(
+                        rs.getLong("id"),
+                        rs.getLong("user_id"),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("logo_url"),
+                        rs.getString("description"),
+                        rs.getString("timezone"),
+                        rs.getBoolean("active"),
+                        rs.getDate("created_at"),
+                        rs.getDate("updated_at")
+                )
+                );
+
+
+        return businesses;
+    }
+
+    @Override
+    public Business getBusinessByUserId(Long userId) {
+
+        String query = "SELECT * FROM businesses WHERE user_id = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(
+                    query,
+                    (rs, rowNum) -> new Business(
+                            rs.getLong("id"),
+                            rs.getLong("user_id"),
+                            rs.getString("name"),
+                            rs.getString("address"),
+                            rs.getString("logo_url"),
+                            rs.getString("description"),
+                            rs.getString("timezone"),
+                            rs.getBoolean("active"),
+                            rs.getDate("created_at"),
+                            rs.getDate("updated_at")
+                    ),
+                    userId
+            );
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            throw new BusinessNotFoundException("No business found for user with id " + userId);
+        }
+
+
+
+
     }
 
 

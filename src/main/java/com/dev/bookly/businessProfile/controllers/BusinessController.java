@@ -69,14 +69,17 @@ public class BusinessController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable Long id){
 
-         businessServiceImpl.delete(id);
 
-        return "Business with id " + id + " was deleted successfully";
-
-    }
+    //this endpoint in admin now, its work here, maybe later we reuse it... don't remove!!
+//    @DeleteMapping("/delete/{id}")
+//    public String delete(@PathVariable Long id){
+//
+//         businessServiceImpl.delete(id);
+//
+//        return "Business with id " + id + " was deleted successfully";
+//
+//    }
 
 
 

@@ -3,6 +3,7 @@ package com.dev.bookly.businessProfile.dtos;
 import com.dev.bookly.businessProfile.domains.Business;
 import com.dev.bookly.businessProfile.dtos.request.BusinessRequestDTO;
 import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTO;
+import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTOAdmin;
 import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.role.dtos.RoleDTO;
 import com.dev.bookly.role.dtos.RoleMapper;
@@ -27,6 +28,19 @@ public class BusinessMapper {
                     entity.isActive()
             );
         }
+    public static BusinessResponseDTOAdmin toResponseDTOAdmin(Business entity) {
+        return new BusinessResponseDTOAdmin(
+                entity.getId(),
+                entity.getUserId(),
+                entity.getName(),
+                entity.getAddress(),
+                entity.getLogoUrl(),
+                entity.getDescription(),
+                entity.getTimeZone(),
+                entity.isActive(),
+                entity.getCreatedAt()
+        );
+    }
     public static Business toBusiness(BusinessRequestDTO entity,Long userId) {
         return new Business(
                 null,

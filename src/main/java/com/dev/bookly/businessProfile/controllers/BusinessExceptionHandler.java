@@ -1,5 +1,6 @@
 package com.dev.bookly.businessProfile.controllers;
 
+import com.dev.bookly.businessProfile.exceptions.AccessDeniedException;
 import com.dev.bookly.businessProfile.exceptions.BusinessAlreadyExistsException;
 import com.dev.bookly.businessProfile.exceptions.BusinessNotFoundException;
 import com.dev.bookly.global.ExceptionResponseDTO;
@@ -46,6 +47,22 @@ public class BusinessExceptionHandler {
 
         return new ResponseEntity<>(exceptionResponseDTO, HttpStatus.CONFLICT);
 
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponseDTO> handleAccessDeniedException(
+            AccessDeniedException accessDeniedException,
+            HttpServletRequest request
+    ){
+        ExceptionResponseDTO exceptionResponseDTO = new ExceptionResponseDTO(
+                accessDeniedException.getMessage(),
+                "NO_ACCESS_TO_GET",
+                request.getMethod(),
+                HttpStatus.CONFLICT.value(),
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(exceptionResponseDTO, HttpStatus.FORBIDDEN);
     }
 }
 

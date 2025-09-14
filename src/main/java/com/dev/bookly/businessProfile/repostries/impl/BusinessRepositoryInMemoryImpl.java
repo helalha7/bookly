@@ -39,6 +39,16 @@ public class BusinessRepositoryInMemoryImpl implements BusinessRepository {
     }
 
     @Override
+    public List<Business> getAllUsersBusinesses() {
+        return List.of();
+    }
+
+    @Override
+    public Business getBusinessByUserId(Long userId) {
+        return null;
+    }
+
+    @Override
     public Long delete(Long id) {
         return null;
     }
