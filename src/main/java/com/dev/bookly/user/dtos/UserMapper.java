@@ -1,10 +1,12 @@
 package com.dev.bookly.user.dtos;
 
+import com.dev.bookly.auth.dtos.request.RegisterRequestDTO;
 import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.role.dtos.RoleDTO;
 import com.dev.bookly.role.dtos.RoleMapper;
 import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
+import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
@@ -65,6 +67,35 @@ public class UserMapper {
         );
 
         return user;
+    }
+
+    public static User toUser(RegisterRequestDTO registerRequestDTO) {
+        Account account = new Account(
+                null,
+                null,
+                registerRequestDTO.getUsername().trim(),
+                registerRequestDTO.getPassword().trim(),
+                registerRequestDTO.getEmail(),
+                registerRequestDTO.getPhoneNumber(),
+                true,
+                List.of(new Role(2,"TENANT"))
+        );
+        User user = new User(
+                null,
+                registerRequestDTO.getFirstName().trim(),
+                registerRequestDTO.getLastName().trim(),
+                registerRequestDTO.getCity().trim(),
+                registerRequestDTO.getHouseNumber(),
+                registerRequestDTO.getStreet().trim(),
+                account
+        );
+        return user;
+    }
+
+    public static Account toAccount(UserAccountStatusUpdateRequestDTO dto) {
+        Account account = new Account();
+        account.setActiveStatus(dto.is_active());
+        return account;
     }
 
     public static UserResponseDTO toUserResponseDTO(User user) {

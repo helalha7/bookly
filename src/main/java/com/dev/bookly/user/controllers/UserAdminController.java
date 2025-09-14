@@ -1,15 +1,20 @@
 package com.dev.bookly.user.controllers;
 
+import com.dev.bookly.global.pagination.PageRequestDTO;
+import com.dev.bookly.global.pagination.PageResponseDTO;
+import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 import com.dev.bookly.user.services.UserService;
+import com.dev.bookly.user.validators.UserCreationValidator;
+import com.dev.bookly.user.validators.UserIdValidator;
+import com.dev.bookly.user.validators.UserUpdateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 
 @RestController
@@ -17,7 +22,7 @@ import java.util.List;
 public class UserAdminController {
 
 
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserAdminController(UserService userService)  {
@@ -28,15 +33,20 @@ public class UserAdminController {
 
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserResponseDTO> users = userService.getAllUsers();
-        return new ResponseEntity<>(users,HttpStatus.OK);
+    public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        PageRequestDTO pr = new PageRequestDTO(page, size);
+        PageResponseDTO<UserResponseDTO> response= userService.getAllUsers(pr);
+        return new ResponseEntity<>(response ,HttpStatus.OK);
     }
 
 
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
+        UserIdValidator.validate(userId);
         UserResponseDTO userResponseDTO = userService.getUserById(userId);
         return new ResponseEntity<>(userResponseDTO,HttpStatus.OK);
     }
@@ -45,6 +55,7 @@ public class UserAdminController {
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreationRequestDTO userCreationRequestDTO) {
+        UserCreationValidator.validate(userCreationRequestDTO);
         UserResponseDTO userResponseDTO = userService.createUser(userCreationRequestDTO);
         return new ResponseEntity<>(userResponseDTO, HttpStatus.CREATED);
     }
@@ -53,6 +64,7 @@ public class UserAdminController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        UserIdValidator.validate(userId);
         userService.deleteUser(userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -62,6 +74,8 @@ public class UserAdminController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<Void> updateUserInfo(@PathVariable Long userId, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        UserIdValidator.validate(userId);
+        UserUpdateValidator.validate(userUpdateRequestDTO);
         userService.updateUserInfo(userId, userUpdateRequestDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }

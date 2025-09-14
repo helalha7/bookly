@@ -12,7 +12,7 @@ import java.util.List;
 @Repository("AssignedRolesRepoMySQL")
 public class AssignedRolesMySQLImpl implements AssignedRolesRepository {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public AssignedRolesMySQLImpl(DataSource dataSource) {

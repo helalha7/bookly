@@ -5,6 +5,7 @@ import com.dev.bookly.user.dtos.requests.UserChangePasswordRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 import com.dev.bookly.user.services.UserService;
+import com.dev.bookly.user.validators.UserUpdateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ public class UserMeController {
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserUpdateRequestDTO userUpdateRequestDTO
     ) {
+        UserUpdateValidator.validate(userUpdateRequestDTO);
         userService.updateUserInfo(((UserDetailsImpl) userDetails).getId(), userUpdateRequestDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }

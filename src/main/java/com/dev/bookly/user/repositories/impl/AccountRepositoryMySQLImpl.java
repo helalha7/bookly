@@ -13,7 +13,7 @@ import java.util.List;
 @Repository("AccountRepoMySQL")
 public class AccountRepositoryMySQLImpl implements AccountRepository {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public AccountRepositoryMySQLImpl(DataSource dataSource) {
