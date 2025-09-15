@@ -10,7 +10,7 @@ public class ResourceMapper {
                 null,
                 serivceId,
                 resourceRequestDTO.getName(),
-                resourceRequestDTO.getCapacity(),null
+                resourceRequestDTO.getCapacity()
         );
         return resource;
     }

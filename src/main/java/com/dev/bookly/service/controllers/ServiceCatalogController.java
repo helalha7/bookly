@@ -29,8 +29,10 @@ public class ServiceCatalogController {
 
     @GetMapping("/services")
     public ResponseEntity<List<ServiceResponseDTO>> listServices(@PathVariable Long businessId) {
+
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         ownershipService.userOwnsBusiness(businessId,userName);
+
         List<ServiceResponseDTO> list = svc.listServices(businessId);
         return ResponseEntity.ok(list);
     }
@@ -38,6 +40,10 @@ public class ServiceCatalogController {
     @PostMapping("/services")
     public ResponseEntity<ServiceResponseDTO> createService(@PathVariable Long businessId,
                                                             @RequestBody ServiceRequestDTO dto) {
+
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        ownershipService.userOwnsBusiness(businessId,userName);
+
         ServiceResponseDTO created = svc.createService(businessId, dto);
         return new ResponseEntity<>(created,HttpStatus.CREATED);
     }
@@ -46,6 +52,10 @@ public class ServiceCatalogController {
     public ResponseEntity<ServiceResponseDTO> updateService(@PathVariable Long businessId,
                                                             @PathVariable Long serviceId,
                                                             @RequestBody ServiceRequestDTO dto) {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        ownershipService.userOwnsService(businessId , serviceId ,username);
+
         ServiceResponseDTO updated = svc.updateService(businessId, serviceId, dto);
         return new ResponseEntity<>(updated,HttpStatus.OK);
     }

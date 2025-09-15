@@ -29,14 +29,14 @@ public class OwnershipServiceImpl implements OwnershipService {
 
     @Override
     public void userOwnsService(Long businessId, Long servicesId, String username) {
-        if (!ownershipRepository.userOwnsService(businessId, servicesId, username)) {
+        if (!ownershipRepository.userOwnsService(businessId, servicesId, username) && !isAdmin()) {
             throw new AccessDeniedException("You do not own this service");
         }
     }
 
     @Override
     public void userOwnsResource(Long businessId, Long servicesId, Long resourceId, String username) {
-        if (!ownershipRepository.userOwnsResource(businessId, servicesId, resourceId, username)) {
+        if (!ownershipRepository.userOwnsResource(businessId, servicesId, resourceId, username) && !isAdmin()) {
             throw new AccessDeniedException("You do not own this resource");
         }
     }

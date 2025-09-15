@@ -8,16 +8,13 @@ public class Resource {
     private Long serviceId;
     private String name;
     private int capacity;
-    private Date createdAt;
 
-    public Resource(Long id, Long serviceId, String name, int capacity, Date createdAt) {
+    public Resource(Long id, Long serviceId, String name, int capacity) {
         this.id = id;
         this.serviceId = serviceId;
         this.name = name;
         this.capacity = capacity;
-        this.createdAt = createdAt;
     }
-    public Resource() {}
 
     public Long getId() {
         return id;
@@ -49,13 +46,5 @@ public class Resource {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 }

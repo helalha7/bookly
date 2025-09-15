@@ -8,6 +8,10 @@ import com.dev.bookly.service.dtos.requests.ResourceRequestDTO;
 import com.dev.bookly.service.dtos.requests.ServiceRequestDTO;
 import com.dev.bookly.service.dtos.responses.ResourceResponseDTO;
 import com.dev.bookly.service.dtos.responses.ServiceResponseDTO;
+import com.dev.bookly.service.exceptions.resourcesExceptions.DuplicateResourceException;
+import com.dev.bookly.service.exceptions.resourcesExceptions.InvalidCapacityException;
+import com.dev.bookly.service.exceptions.resourcesExceptions.ResourceNotFoundException;
+import com.dev.bookly.service.exceptions.resourcesExceptions.ValidationException;
 import com.dev.bookly.service.repositories.ResourceRepository;
 import com.dev.bookly.service.repositories.ServiceRepository;
 import com.dev.bookly.service.servises.ServiceCatalogService;
@@ -110,23 +114,83 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
 //        ResourceResponseDTO  resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource1);
 //        return resourceResponseDTO;
 //    }
-@Override
-public List<ResourceResponseDTO> listResources(Long businessId, Long servicesId, String username) {
-    return null;
-}
 
     @Override
-    public ResourceResponseDTO createResource(Long businessId, Long servicesId, ResourceRequestDTO resourceRequestDTO, String username) {
-        return null;
+    public List<ResourceResponseDTO> listResources(Long businessId, Long servicesId, String username) {
+
+        List<Resource> resources = resourceRepository.findByServiceId(servicesId);
+
+        if (resources.isEmpty()) {
+            throw new ResourceNotFoundException("No resources found for serviceId: " + servicesId);
+        }
+
+        List<ResourceResponseDTO> resourcesDTO = new ArrayList<>();
+        for (Resource resource : resources) {
+            resourcesDTO.add(ResourceMapper.toResourceResponseDTO(resource));
+        }
+
+        return resourcesDTO;
     }
 
     @Override
-    public ResourceResponseDTO updateResource(Long businessId, Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO, String username) {
-        return null;
+    public ResourceResponseDTO createResource(Long businessId, Long servicesId, ResourceRequestDTO resourceRequestDTO, String username) {
+
+        Resource resource = ResourceMapper.toResource(servicesId, resourceRequestDTO);
+
+        if (resourceRequestDTO.getName() == null || resourceRequestDTO.getName().isBlank()) {
+            throw new ValidationException("Resource name cannot be empty");
+        }
+
+        if (resourceRequestDTO.getCapacity() <= 0) {
+            throw new InvalidCapacityException("Capacity must be greater than zero");
+        }
+
+        if (resourceRepository.existsByName(resource.getName())) {
+            throw new DuplicateResourceException("Resource '" + resource.getName() + "' already exists.");
+        }
+
+        Resource saved = resourceRepository.save(resource);
+        return ResourceMapper.toResourceResponseDTO(saved);
+    }
+
+    @Override
+    public ResourceResponseDTO updateResource(Long businessId,Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO, String username) {
+
+        Resource existing = resourceRepository.getResourceById(resourceId);
+        if (existing == null) {
+            throw new ResourceNotFoundException("Resource with id " + resourceId + " not found");
+        }
+
+
+        if (resourceRequestDTO.getName() != null) {
+            if (resourceRequestDTO.getName().isBlank()) {
+                throw new ValidationException("Resource name cannot be empty");
+            }
+            existing.setName(resourceRequestDTO.getName());
+        }
+
+
+        if (resourceRequestDTO.getCapacity() != null) {
+            if (resourceRequestDTO.getCapacity() <= 0) {
+                throw new InvalidCapacityException("Capacity must be greater than zero");
+            }
+            existing.setCapacity(resourceRequestDTO.getCapacity());
+        }
+
+        Resource updated = resourceRepository.update(resourceId, existing);
+        return ResourceMapper.toResourceResponseDTO(updated);
     }
 
     @Override
     public ResourceResponseDTO deleteResource(Long businessId, Long servicesId, Long resourceId, String username) {
-        return null;
+
+        Resource resource = resourceRepository.getResourceById(resourceId);
+
+        if (resource == null) {
+            throw new ResourceNotFoundException("Resource with id " + resourceId + " not found");
+        }
+
+        resourceRepository.delete(resourceId);
+        return ResourceMapper.toResourceResponseDTO(resource);
     }
 }

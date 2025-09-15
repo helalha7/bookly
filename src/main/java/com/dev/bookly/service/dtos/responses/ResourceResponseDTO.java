@@ -1,10 +1,10 @@
 package com.dev.bookly.service.dtos.responses;
 
 public class ResourceResponseDTO {
-    private final Long id;
-    private final Long serviceId;
-    private final String name;
-    private final int capacity;
+    private Long id;
+    private Long serviceId;
+    private String name;
+    private int capacity;
 
     public ResourceResponseDTO(Long id, Long serviceId, String name, int capacity) {
         this.id = id;

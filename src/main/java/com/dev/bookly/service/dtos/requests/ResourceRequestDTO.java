@@ -1,10 +1,10 @@
 package com.dev.bookly.service.dtos.requests;
 
 public class ResourceRequestDTO {
-    private final String name;
-    private final int capacity;
+    private String name;
+    private Integer capacity;
 
-    public ResourceRequestDTO(String name, int capacity) {
+    public ResourceRequestDTO(String name, Integer capacity) {
         this.name = name;
         this.capacity = capacity;
     }
@@ -13,7 +13,7 @@ public class ResourceRequestDTO {
         return name;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 }

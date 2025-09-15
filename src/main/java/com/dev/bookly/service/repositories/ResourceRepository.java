@@ -5,13 +5,17 @@ import com.dev.bookly.service.domain.Resource;
 import java.util.List;
 
 public interface ResourceRepository {
-    public List<Resource> findByService(Long serviceId);
-    public Resource findById(Long id);
+    List<Resource> findByServiceId(Long serviceId);
 
-    public boolean existsByName(Long serviceId, String name);
+    Resource save(Resource resource);
 
-    public Resource save(Resource r);
     Resource update(Long resourceId, Resource resource);
+
+    void delete(Long resourceId);
+
+    Resource getResourceById(Long resourceId);
+
+    boolean existsByName(String name);
 
 
 }

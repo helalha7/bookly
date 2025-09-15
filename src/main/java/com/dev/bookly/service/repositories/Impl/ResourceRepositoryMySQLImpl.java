@@ -23,93 +23,85 @@ import java.util.Objects;
 
 public class ResourceRepositoryMySQLImpl implements ResourceRepository {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedJdbc;
+    private JdbcTemplate jdbcTemplate;
 
-    public ResourceRepositoryMySQLImpl(DataSource ds){
-        this.jdbcTemplate = new JdbcTemplate(ds);
-        this.namedJdbc    = new NamedParameterJdbcTemplate(ds);
-    }
-    private static final RowMapper<Resource> MAPPER = new RowMapper<Resource>() {
-        @Override
-        public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Resource r = new Resource();
-            r.setId(rs.getLong("id"));
-            r.setServiceId(rs.getLong("service_id"));
-            r.setName(rs.getString("name"));
-            r.setCapacity(rs.getInt("capacity"));
-            r.setCreatedAt(rs.getDate("created_at"));
-            return r;
-        }
-
-    };
-
-    @Override
-    public List<Resource> findByService(Long serviceId) {
-
-        return jdbcTemplate.query("SELECT * FROM resources WHERE service_id=?",MAPPER,serviceId);
-
-
+    public ResourceRepositoryMySQLImpl(DataSource dataSource ) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
-    public Resource findById(Long id) {
+    public List<Resource> findByServiceId(Long serviceId) {
+        String query =
+                """
+                    SELECT * FROM resources WHERE service_id = ?;
+                """;
 
-        List<Resource> list = jdbcTemplate.query("SELECT * FROM resources WHERE service_id=?",MAPPER,id);
-        return list.getFirst();
+        List<Resource> resources = jdbcTemplate.query(query, (rs, rowNum) -> {
+            return new Resource(
+                    rs.getLong("id"),
+                    rs.getLong("service_id"),
+                    rs.getString("name"),
+                    rs.getInt("capacity")
 
-    }
+            );
+        }, serviceId);
 
-    @Override
-    public boolean existsByName(Long serviceId, String name) {
-        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM resources WHERE service_id=? AND LOWER(name)=LOWER(?)",Integer.class,serviceId,name);
-
-        return count!=null && count>0;
+        return resources;
     }
 
     @Override
     public Resource save(Resource resource) {
-        String sql =
+        String query =
                 """
-                  insert into resources(service_id , name , capacity) values (? ,? , ?);
+                  insert into resources(service_id , name , capacity) values (? ,? , ?);  
                 """;
-        KeyHolder kh = new GeneratedKeyHolder();
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, resource.getServiceId());
-            ps.setString(2, resource.getName());
-            ps.setInt(3, resource.getCapacity());
-            return ps;
-        }, kh);
-
-        resource.setId(Objects.requireNonNull(kh.getKey()).longValue());
+        jdbcTemplate.update(query,resource.getServiceId(),resource.getName(),resource.getCapacity());
+        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        resource.setId(id);
         return resource;
     }
 
     @Override
     public Resource update(Long resourceId, Resource resource) {
-        // Update only non-null values via COALESCE; requires named params
-        final String sql = """
-            UPDATE resources
-               SET name     = COALESCE(:name, name),
-                   capacity = COALESCE(:capacity, capacity)
-             WHERE id = :id
-        """;
+        String query =
+                """
+                   update resources set name = ? , capacity = ? where id = ?;     
+                """;
+        jdbcTemplate.update(query,resource.getName(),resource.getCapacity(),resourceId);
+        resource.setId(resourceId);
+        return resource;
+    }
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", resourceId)
-                .addValue("name", resource.getName())
-                .addValue("capacity", resource.getCapacity()); // make this Integer in domain to skip when null
+    @Override
+    public void delete(Long resourceId) {
+        String query =
+                """
+                   delete from resources where id = ?     
+                """;
+        jdbcTemplate.update(query,resourceId);
+    }
 
-        int rows = namedJdbc.update(sql, params);
-        if (rows == 0) {
-            throw new IllegalStateException("Resource not found: " + resourceId);
+    @Override
+    public Resource getResourceById(Long resourceId) {
+        String query = "SELECT * FROM resources WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(query, new Object[]{resourceId}, (rs, rowNum) ->
+                    new Resource(
+                            rs.getLong("id"),
+                            rs.getLong("service_id"),
+                            rs.getString("name"),
+                            rs.getInt("capacity")
+                    )
+            );
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            return null;
         }
+    }
 
-        return namedJdbc.queryForObject(
-                "SELECT * FROM resources WHERE id = :id",
-                new MapSqlParameterSource("id", resourceId),
-                MAPPER
-        );
+    @Override
+    public boolean existsByName(String name) {
+        String query = "SELECT COUNT(*) FROM resources WHERE name = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, name);
+        return count != null && count > 0;
     }
 }
