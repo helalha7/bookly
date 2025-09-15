@@ -12,9 +12,13 @@ public interface ServiceCatalogService {
     public List<ServiceResponseDTO> listServices(Long businessId);
     public ServiceResponseDTO createService(Long businessId , ServiceRequestDTO dto);
     public ServiceResponseDTO updateService(Long businessId ,Long serviceId, ServiceRequestDTO dto);
-    public List<ResourceResponseDTO> listResources(Long businessId , Long serviceId);
-    public ResourceResponseDTO createResource(Long businessId , Long serviceId, ResourceRequestDTO dto);
-    public ResourceResponseDTO updateResource(Long businessId,Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO);
+    List<ResourceResponseDTO> listResources(Long businessId, Long servicesId, String username);
+
+    ResourceResponseDTO createResource(Long businessId, Long servicesId, ResourceRequestDTO resourceRequestDTO, String username);
+
+    ResourceResponseDTO updateResource(Long businessId, Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO, String username);
+
+    ResourceResponseDTO deleteResource(Long businessId, Long servicesId, Long resourceId, String username);
 
 
 

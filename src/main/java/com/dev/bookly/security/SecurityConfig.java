@@ -22,6 +22,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authorize) -> authorize
                                 .requestMatchers("/api/me/**").hasAuthority("TENANT")
+                                .requestMatchers("/api/me/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/users/**").hasAuthority("ADMIN")
                                 .anyRequest().permitAll()
                 )

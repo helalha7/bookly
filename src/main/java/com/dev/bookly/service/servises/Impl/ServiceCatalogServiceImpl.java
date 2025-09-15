@@ -81,36 +81,52 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
 
 
 
+
+
+
 //    @Override
-//    public ResourceResponseDTO updateResources(Long businessId, Long serviceId, ResourceRequestDTO dto) {
-//        return null;
+//    public List<ResourceResponseDTO> listResources(Long businessId, Long servicesId) {
+//        List<Resource> resources = resourceRepository.findByService(servicesId);
+//        List<ResourceResponseDTO> resourcesDTO = new ArrayList<>();
+//        for (Resource resource : resources) {
+//            ResourceResponseDTO resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource);
+//            resourcesDTO.add(resourceResponseDTO);
+//        }
+//        return resourcesDTO;
 //    }
-
+//
+//    @Override
+//    public ResourceResponseDTO createResource(Long businessId, Long servicesId, ResourceRequestDTO resourceRequestDTO) {
+//        Resource resource = ResourceMapper.toResource(servicesId , resourceRequestDTO);
+//        Resource resource1 = resourceRepository.save(resource);
+//        ResourceResponseDTO  resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource1);
+//        return resourceResponseDTO;
+//    }
+//
+//    @Override
+//    public ResourceResponseDTO updateResource(Long businessId,Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO) {
+//        Resource resource = ResourceMapper.toResource(servicesId , resourceRequestDTO);
+//        Resource resource1 = resourceRepository.update(resourceId ,resource);
+//        ResourceResponseDTO  resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource1);
+//        return resourceResponseDTO;
+//    }
+@Override
+public List<ResourceResponseDTO> listResources(Long businessId, Long servicesId, String username) {
+    return null;
+}
 
     @Override
-    public List<ResourceResponseDTO> listResources(Long businessId, Long servicesId) {
-        List<Resource> resources = resourceRepository.findByService(servicesId);
-        List<ResourceResponseDTO> resourcesDTO = new ArrayList<>();
-        for (Resource resource : resources) {
-            ResourceResponseDTO resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource);
-            resourcesDTO.add(resourceResponseDTO);
-        }
-        return resourcesDTO;
+    public ResourceResponseDTO createResource(Long businessId, Long servicesId, ResourceRequestDTO resourceRequestDTO, String username) {
+        return null;
     }
 
     @Override
-    public ResourceResponseDTO createResource(Long businessId, Long servicesId, ResourceRequestDTO resourceRequestDTO) {
-        Resource resource = ResourceMapper.toResource(servicesId , resourceRequestDTO);
-        Resource resource1 = resourceRepository.save(resource);
-        ResourceResponseDTO  resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource1);
-        return resourceResponseDTO;
+    public ResourceResponseDTO updateResource(Long businessId, Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO, String username) {
+        return null;
     }
 
     @Override
-    public ResourceResponseDTO updateResource(Long businessId,Long servicesId, Long resourceId, ResourceRequestDTO resourceRequestDTO) {
-        Resource resource = ResourceMapper.toResource(servicesId , resourceRequestDTO);
-        Resource resource1 = resourceRepository.update(resourceId ,resource);
-        ResourceResponseDTO  resourceResponseDTO = ResourceMapper.toResourceResponseDTO(resource1);
-        return resourceResponseDTO;
+    public ResourceResponseDTO deleteResource(Long businessId, Long servicesId, Long resourceId, String username) {
+        return null;
     }
 }
