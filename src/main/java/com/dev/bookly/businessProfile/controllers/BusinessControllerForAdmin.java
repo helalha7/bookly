@@ -1,8 +1,15 @@
 package com.dev.bookly.businessProfile.controllers;
 
+import com.dev.bookly.activity.domain.ActivityAction;
+import com.dev.bookly.activity.domain.HttpMethodType;
+import com.dev.bookly.activity.dto.request.ActivityRequestDTO;
+import com.dev.bookly.activity.service.impl.ActivityServiceImpl;
 import com.dev.bookly.businessProfile.dtos.response.BusinessResponseDTOAdmin;
 import com.dev.bookly.businessProfile.exceptions.BusinessNotFoundException;
 import com.dev.bookly.businessProfile.services.impl.BusinessServiceImpl;
+import com.dev.bookly.security.services.UserDetailsImpl;
+import com.dev.bookly.utils.HelpFunc;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +24,11 @@ import java.util.*;
 public class BusinessControllerForAdmin {
 
     private BusinessServiceImpl businessServiceImpl;
-
+    private ActivityServiceImpl activityServiceImpl;
     @Autowired
-    BusinessControllerForAdmin(BusinessServiceImpl businessServiceImpl){
+    BusinessControllerForAdmin(BusinessServiceImpl businessServiceImpl, ActivityServiceImpl activityServiceImpl) {
         this.businessServiceImpl = businessServiceImpl;
+        this.activityServiceImpl = activityServiceImpl;
     }
 
 
@@ -49,8 +57,24 @@ public class BusinessControllerForAdmin {
 
 
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails){
-        businessServiceImpl.delete(id);
-        return "Business with id " + id + " was deleted successfully";
+    public ResponseEntity<String> delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request ){
+        Long userId = ((UserDetailsImpl) userDetails).getId();
+        String endpoint = request.getRequestURI();
+        HttpMethodType method = HttpMethodType.fromString(request.getMethod());
+        try{
+            businessServiceImpl.delete(id);
+            String details = HelpFunc.toJson(Map.of("status", "SUCCESS"));
+            activityServiceImpl.log(new ActivityRequestDTO(
+                    userId, ActivityAction.DELETE, endpoint, method, details
+            ));
+            return new ResponseEntity<>("Business with id " + id + " was deleted successfully",HttpStatus.OK);
+        }catch (Exception e){
+            String details = HelpFunc.toJson(Map.of("status", "FAILED"));
+            activityServiceImpl.log(new ActivityRequestDTO(
+                    userId, ActivityAction.DELETE, endpoint, method, details
+            ));
+            throw e;
+        }
+
 
     }}

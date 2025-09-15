@@ -24,6 +24,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/me/**").hasAuthority("TENANT")
                                 .requestMatchers("/api/users/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/businesses/admin/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/activities/**").hasAuthority("ADMIN")
                                 .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
