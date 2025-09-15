@@ -29,6 +29,7 @@ public class BusinessController {
     @GetMapping
     public ResponseEntity<List<BusinessResponseDTO>> getAllBusiness(@AuthenticationPrincipal UserDetails userDetails){
 
+        System.out.println(userDetails.getUsername());
         List<BusinessResponseDTO> businessResponseDTOS = businessServiceImpl.getAll(((UserDetailsImpl) userDetails).getId());
 
         return new ResponseEntity<>(businessResponseDTOS, HttpStatus.OK);

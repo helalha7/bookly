@@ -2,12 +2,12 @@ package com.dev.bookly.user.controllers;
 
 import com.dev.bookly.global.pagination.PageRequestDTO;
 import com.dev.bookly.global.pagination.PageResponseDTO;
-import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 import com.dev.bookly.user.services.UserService;
+import com.dev.bookly.user.validators.AccountStatusValidator;
 import com.dev.bookly.user.validators.UserCreationValidator;
 import com.dev.bookly.user.validators.UserIdValidator;
 import com.dev.bookly.user.validators.UserUpdateValidator;
@@ -85,6 +85,8 @@ public class UserAdminController {
 
     @PutMapping("/{userId}/status")
     public ResponseEntity<Void> updateUserAccountStatus(@PathVariable Long userId, @RequestBody UserAccountStatusUpdateRequestDTO userAccountStatusUpdateRequestDTO) {
+        AccountStatusValidator.validate(userAccountStatusUpdateRequestDTO);
+        userService.updateUserAccountStatus(userId, userAccountStatusUpdateRequestDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -7,10 +7,12 @@ import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
 import com.dev.bookly.user.dtos.UserMapper;
 import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
+import com.dev.bookly.user.dtos.requests.UserChangePasswordRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 import com.dev.bookly.user.exceptions.UserAlreadyExistsException;
+import com.dev.bookly.user.exceptions.UserInvalidDataException;
 import com.dev.bookly.user.exceptions.UserNotFoundException;
 import com.dev.bookly.user.repositories.AccountRepository;
 import com.dev.bookly.user.repositories.AssignedRolesRepository;
@@ -135,7 +137,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserAccountStatus(Long userId, UserAccountStatusUpdateRequestDTO userAccountStatusUpdateRequestDTO) {
+        Account account = UserMapper.toAccount(userAccountStatusUpdateRequestDTO);
+        accountRepository.updateAccountInfo(userId, account);
+    }
 
+    @Override
+    public void updateUserPassword(Long userId, UserChangePasswordRequestDTO userChangePasswordRequestDTO) {
+        //getting the user from the db
+        User user = userRepository.getUserById(userId);
+
+        //current password check
+        String encodedNewPassword = passwordEncoder.encode(userChangePasswordRequestDTO.getNewPassword());
+        if(!passwordEncoder.matches(
+                userChangePasswordRequestDTO.getCurrentPassword(),
+                user.getAccount().getPassword()
+        ))
+            throw new UserInvalidDataException("incorrect current password");
+
+        //updating the password
+        Account account = new Account();
+        account.setPassword(encodedNewPassword);
+        accountRepository.updateAccountInfo(userId, account);
     }
 
     @Override

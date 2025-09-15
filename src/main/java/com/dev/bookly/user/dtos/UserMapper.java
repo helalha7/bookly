@@ -94,7 +94,7 @@ public class UserMapper {
 
     public static Account toAccount(UserAccountStatusUpdateRequestDTO dto) {
         Account account = new Account();
-        account.setActiveStatus(dto.is_active());
+        account.setActiveStatus(dto.getActive());
         return account;
     }
 

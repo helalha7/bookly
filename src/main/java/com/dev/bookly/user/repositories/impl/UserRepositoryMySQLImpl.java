@@ -4,12 +4,10 @@ import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
-import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -248,26 +246,6 @@ public class UserRepositoryMySQLImpl implements UserRepository {
         return jdbcTemplate.update(query.toString(), params.toArray());
     }
 
-    /**
-     * TODO: Implement account status update for a user.
-     *
-     * @param userId user ID
-     * @param userAccountStatusUpdateRequestDTO DTO with status update info
-     */
-    @Override
-    public void updateUserAccountStatus(Long userId, UserAccountStatusUpdateRequestDTO userAccountStatusUpdateRequestDTO) {
-        // not yet implemented
-    }
-
-    /**
-     * TODO: Implement password reset trigger for a user.
-     *
-     * @param userId user ID
-     */
-    @Override
-    public void triggerResetPassword(Long userId) {
-        // not yet implemented
-    }
 
     /**
      * Helper method that maps a row in the ResultSet to a {@link User} object,

@@ -39,6 +39,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/me/**").authenticated()
                                 .requestMatchers("/api/users/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/roles/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/businesses/**").hasAuthority("TENANT")
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> {

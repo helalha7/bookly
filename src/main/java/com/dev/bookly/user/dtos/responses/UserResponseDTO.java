@@ -1,6 +1,5 @@
 package com.dev.bookly.user.dtos.responses;
 
-import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.role.dtos.RoleDTO;
 
 import java.util.List;
