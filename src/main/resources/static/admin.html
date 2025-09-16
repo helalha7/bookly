@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Admin WS</title>
+    <style>
+        :root {
+          --bg: #f5f6fa;
+          --card: #fff;
+          --muted: #6b7280;
+          --border: #e5e7eb;
+          --ok: #16a34a;
+          --warn: #f59e0b;
+          --info: #2563eb;
+          --error: #dc2626;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, Arial, sans-serif; background: var(--bg); margin:0; padding: 24px; }
+        h1 { margin: 0 0 16px; font-weight: 700; }
+        .toolbar { display:flex; gap:8px; align-items:center; margin-bottom:16px; }
+        .badge { display:inline-flex; align-items:center; gap:6px; background:#eef2ff; color:#1e40af; padding:4px 10px; border-radius:999px; font-size:12px; }
+        #cards { display: grid; gap: 12px; grid-template-columns: 1fr; max-width: 980px; }
+        .card {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-left-width: 6px;
+          border-radius: 10px;
+          padding: 14px 16px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+          animation: fadeIn .22s ease-out;
+        }
+        .card.activity { border-left-color: var(--ok); }
+        .card.broadcast { border-left-color: var(--warn); }
+        .card.system { border-left-color: var(--info); }
+        .card.error { border-left-color: var(--error); }
+
+        .header { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+        .title { font-weight: 700; font-size: 15px; display:flex; align-items:center; gap:8px; }
+        .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; background:#eef2ff; color:#1e40af; }
+        .time { color: var(--muted); font-size: 12px; white-space:nowrap; }
+        .rows { display:grid; gap:6px; }
+        .row { display:grid; grid-template-columns: 140px 1fr; gap:12px; font-size:14px; }
+        .key { color: var(--muted); }
+        .value code { background:#f3f4f6; padding:2px 6px; border-radius:6px; }
+        .kv { display:flex; flex-wrap:wrap; gap:6px; }
+        .kv .chip { background:#f3f4f6; border:1px solid var(--border); padding:2px 8px; border-radius:999px; font-size:12px; }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(6px)} to {opacity:1; transform:none} }
+
+        @media (max-width: 560px) {
+          .row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<h1>🔔 Admin Notifications</h1>
+<div class="toolbar">
+    <span id="status" class="badge">Connecting…</span>
+    <button id="clearBtn">Clear</button>
+</div>
+<div id="cards"></div>
+
+<!-- SockJS -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<!-- STOMP (UMD) -->
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.2.0/bundles/stomp.umd.min.js"></script>
+
+<script>
+    const cardsEl = document.getElementById('cards');
+    const statusEl = document.getElementById('status');
+    const clearBtn = document.getElementById('clearBtn');
+
+    clearBtn.onclick = () => { cardsEl.innerHTML = ''; };
+
+    // Helpers
+    const fmtTime = iso => {
+      try {
+        const d = iso ? new Date(iso) : new Date();
+        // عرض التاريخ + الوقت المحلي
+        return d.toLocaleString();
+      } catch { return new Date().toLocaleString(); }
+    };
+
+    const safeJsonParse = (txt) => {
+      if (typeof txt !== 'string') return null;
+      try { return JSON.parse(txt); } catch { return null; }
+    };
+
+    const chipList = (obj) => {
+      const frag = document.createDocumentFragment();
+      Object.entries(obj || {}).forEach(([k,v]) => {
+        const span = document.createElement('span');
+        span.className = 'chip';
+        span.textContent = `${k}: ${String(v)}`;
+        frag.appendChild(span);
+      });
+      return frag;
+    };
+
+    const addRow = (wrap, k, vNodeOrText) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const key = document.createElement('div');
+      key.className = 'key';
+      key.textContent = k;
+      const val = document.createElement('div');
+      val.className = 'value';
+      if (vNodeOrText instanceof Node) {
+        val.appendChild(vNodeOrText);
+      } else {
+        val.textContent = vNodeOrText ?? '—';
+      }
+      row.appendChild(key); row.appendChild(val);
+      wrap.appendChild(row);
+    };
+
+    const renderActivity = (payload, typeLabel='ACTIVITY') => {
+      const {
+        userId, action, entityType, entityId,
+        httpMethod, endpoint, details, createdAt
+      } = payload || {};
+
+      // حاول نفك details إن كانت JSON نصي
+      const parsedDetails = typeof details === 'string' ? safeJsonParse(details) : details;
+
+      const card = document.createElement('div');
+      card.className = 'card activity';
+
+      const header = document.createElement('div');
+      header.className = 'header';
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.innerHTML = `<span class="pill">${typeLabel}</span> ${action || '—'} on ${entityType || '—'}#${entityId || '—'}`;
+      const time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = fmtTime(createdAt);
+      header.appendChild(title); header.appendChild(time);
+
+      const rows = document.createElement('div');
+      rows.className = 'rows';
+      addRow(rows, 'User ID', userId ?? '—');
+      addRow(rows, 'HTTP', httpMethod ?? '—');
+      addRow(rows, 'Endpoint', endpoint ?? '—');
+
+      if (parsedDetails && typeof parsedDetails === 'object') {
+        const kvWrap = document.createElement('div');
+        kvWrap.className = 'kv';
+        kvWrap.appendChild(chipList(parsedDetails));
+        addRow(rows, 'Details', kvWrap);
+      } else if (details != null) {
+        const code = document.createElement('code');
+        code.textContent = String(details);
+        addRow(rows, 'Details', code);
+      }
+
+      card.appendChild(header);
+      card.appendChild(rows);
+      cardsEl.prepend(card);
+    };
+
+    const renderSystem = (payload, typeLabel='BROADCAST') => {
+      const { title: t, body, createdAt } = payload || {};
+      const card = document.createElement('div');
+      card.className = 'card broadcast';
+
+      const header = document.createElement('div');
+      header.className = 'header';
+      const ttl = document.createElement('div');
+      ttl.className = 'title';
+      ttl.innerHTML = `<span class="pill">${typeLabel}</span> ${t || 'System message'}`;
+      const time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = fmtTime(createdAt);
+      header.appendChild(ttl); header.appendChild(time);
+
+      const rows = document.createElement('div');
+      rows.className = 'rows';
+      addRow(rows, 'Message', body ?? '—');
+
+      card.appendChild(header);
+      card.appendChild(rows);
+      cardsEl.prepend(card);
+    };
+
+    const renderUnknown = (env) => {
+      const card = document.createElement('div');
+      card.className = 'card system';
+      const header = document.createElement('div');
+      header.className = 'header';
+      const ttl = document.createElement('div');
+      ttl.className = 'title';
+      ttl.innerHTML = `<span class="pill">UNKNOWN</span> Unrecognized message`;
+      const time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = fmtTime();
+      header.appendChild(ttl); header.appendChild(time);
+
+      const rows = document.createElement('div');
+      rows.className = 'rows';
+      addRow(rows, 'Raw', JSON.stringify(env));
+
+      card.appendChild(header);
+      card.appendChild(rows);
+      cardsEl.prepend(card);
+    };
+
+    // ==== WebSocket ====
+    const sock = new SockJS('/ws');
+    const client = new StompJs.Client({
+      webSocketFactory: () => sock,
+      reconnectDelay: 2000
+    });
+
+    client.onConnect = () => {
+      statusEl.textContent = 'Connected';
+      client.subscribe('/topic/admin.activity', m => {
+        const env = JSON.parse(m.body);   // { channel, type, payload }
+        if ((env.type || '').toUpperCase() === 'ACTIVITY') {
+          renderActivity(env.payload, env.type);
+        } else {
+          // في حال أرسلت Activity بدون type
+          renderActivity(env.payload, env.type || 'ACTIVITY');
+        }
+      });
+
+      client.subscribe('/topic/broadcast', m => {
+        const env = JSON.parse(m.body);
+        const t = (env.type || '').toUpperCase();
+        if (t === 'SYSTEM_ALERT' || t === 'BROADCAST') {
+          renderSystem(env.payload, env.type || 'BROADCAST');
+        } else {
+          renderUnknown(env);
+        }
+      });
+    };
+
+    client.onStompError = f => {
+      statusEl.textContent = 'STOMP error';
+      const card = document.createElement('div');
+      card.className = 'card error';
+      card.innerHTML = `<div class="title">STOMP Error</div><div class="rows"><div class="row"><div class="key">Message</div><div class="value">${f.headers['message'] || 'Unknown'}</div></div></div>`;
+      cardsEl.prepend(card);
+    };
+
+    client.onWebSocketClose = () => { statusEl.textContent = 'Reconnecting…'; };
+    client.activate();
+</script>
+</body>
+</html>
