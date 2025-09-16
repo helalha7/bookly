@@ -7,10 +7,7 @@ import com.dev.bookly.user.dtos.requests.UserCreationRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 import com.dev.bookly.user.services.UserService;
-import com.dev.bookly.user.validators.AccountStatusValidator;
-import com.dev.bookly.user.validators.UserCreationValidator;
-import com.dev.bookly.user.validators.UserIdValidator;
-import com.dev.bookly.user.validators.UserUpdateValidator;
+import com.dev.bookly.user.validators.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +35,7 @@ public class UserAdminController {
             @RequestParam(defaultValue = "20") int size
     ) {
         PageRequestDTO pr = new PageRequestDTO(page, size);
+        PageRequestValidator.validate(pr);
         PageResponseDTO<UserResponseDTO> response= userService.getAllUsers(pr);
         return new ResponseEntity<>(response ,HttpStatus.OK);
     }

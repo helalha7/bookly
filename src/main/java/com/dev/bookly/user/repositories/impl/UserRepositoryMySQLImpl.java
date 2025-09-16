@@ -102,8 +102,23 @@ public class UserRepositoryMySQLImpl implements UserRepository {
      */
     @Override
     public PageResult<User> getAllUsers(int offset, int limit) {
+        String query = """
+                SELECT
+                          u.id AS user_id, u.first_name, u.last_name, u.city, u.street, u.house_number,
+                          a.id AS account_id, a.email, a.username, a.is_active, a.password, a.phone_number,
+                          ar.role_id, r.role
+                        FROM (
+                          SELECT *
+                          FROM users
+                          ORDER BY id
+                          LIMIT ? OFFSET ?
+                        ) AS u
+                        LEFT JOIN accounts a        ON a.user_id = u.id
+                        LEFT JOIN assigned_roles ar ON ar.account_id = a.id
+                        LEFT JOIN roles r           ON r.id = ar.role_id
+        """;
         Map<Long, User> byUserId = jdbcTemplate.query(
-                BASE_SELECT + " ORDER BY user_id LIMIT ? OFFSET ?",
+                query,
                 (rs) -> {
                     Map<Long, User> map = new LinkedHashMap<>();
                     while (rs.next()) {
