@@ -1,15 +1,15 @@
 package com.dev.bookly.user.dtos.requests;
 
 public class UserAccountStatusUpdateRequestDTO {
-    private final boolean is_active;
+    private final Boolean is_active;
 
     public UserAccountStatusUpdateRequestDTO(
-            boolean is_active
+            Boolean is_active
     ) {
         this.is_active = is_active;
     }
 
-    public boolean isIs_active() {
+    public Boolean is_active() {
         return is_active;
     }
 }

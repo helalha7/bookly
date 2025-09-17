@@ -1,10 +1,10 @@
-package com.dev.bookly.user.dtos.requests;
+package com.dev.bookly.auth.dtos.request;
+
 import com.dev.bookly.role.dtos.RoleDTO;
 
 import java.util.List;
 
-public class UserCreationRequestDTO {
-
+public class RegisterRequestDTO {
     private final String firstName;
     private final String lastName;
     private final String username;
@@ -14,9 +14,8 @@ public class UserCreationRequestDTO {
     private final String city;
     private final String street;
     private final Integer houseNumber;
-    private final List<RoleDTO> roles;
 
-    public UserCreationRequestDTO(
+    public RegisterRequestDTO(
             String firstName,
             String lastName,
             String username,
@@ -25,8 +24,7 @@ public class UserCreationRequestDTO {
             String phoneNumber,
             String city,
             String street,
-            Integer houseNumber,
-            List<RoleDTO> roles
+            Integer houseNumber
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -37,15 +35,10 @@ public class UserCreationRequestDTO {
         this.city = city;
         this.street = street;
         this.houseNumber = houseNumber;
-        this.roles = roles;
     }
 
     public String getFirstName() {
         return firstName;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getLastName() {
@@ -54,6 +47,10 @@ public class UserCreationRequestDTO {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getEmail() {
@@ -70,10 +67,6 @@ public class UserCreationRequestDTO {
 
     public String getStreet() {
         return street;
-    }
-
-    public List<RoleDTO> getRoles() {
-        return roles;
     }
 
     public Integer getHouseNumber() {
