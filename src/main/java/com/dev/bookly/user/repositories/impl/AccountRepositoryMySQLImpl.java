@@ -71,7 +71,7 @@ public class AccountRepositoryMySQLImpl implements AccountRepository {
         query.setLength(query.length()-2);
 
         //completing query
-        query.append(" WHERE user_id = ?;");
+        query.append(" WHERE user_id = ?");
         params.add(userId);
 
         return jdbcTemplate.update(

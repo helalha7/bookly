@@ -4,12 +4,10 @@ import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.role.domains.Role;
 import com.dev.bookly.user.domains.Account;
 import com.dev.bookly.user.domains.User;
-import com.dev.bookly.user.dtos.requests.UserAccountStatusUpdateRequestDTO;
 import com.dev.bookly.user.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -104,8 +102,23 @@ public class UserRepositoryMySQLImpl implements UserRepository {
      */
     @Override
     public PageResult<User> getAllUsers(int offset, int limit) {
+        String query = """
+                SELECT
+                          u.id AS user_id, u.first_name, u.last_name, u.city, u.street, u.house_number,
+                          a.id AS account_id, a.email, a.username, a.is_active, a.password, a.phone_number,
+                          ar.role_id, r.role
+                        FROM (
+                          SELECT *
+                          FROM users
+                          ORDER BY id
+                          LIMIT ? OFFSET ?
+                        ) AS u
+                        LEFT JOIN accounts a        ON a.user_id = u.id
+                        LEFT JOIN assigned_roles ar ON ar.account_id = a.id
+                        LEFT JOIN roles r           ON r.id = ar.role_id
+        """;
         Map<Long, User> byUserId = jdbcTemplate.query(
-                BASE_SELECT + " ORDER BY user_id LIMIT ? OFFSET ?",
+                query,
                 (rs) -> {
                     Map<Long, User> map = new LinkedHashMap<>();
                     while (rs.next()) {
@@ -248,26 +261,6 @@ public class UserRepositoryMySQLImpl implements UserRepository {
         return jdbcTemplate.update(query.toString(), params.toArray());
     }
 
-    /**
-     * TODO: Implement account status update for a user.
-     *
-     * @param userId user ID
-     * @param userAccountStatusUpdateRequestDTO DTO with status update info
-     */
-    @Override
-    public void updateUserAccountStatus(Long userId, UserAccountStatusUpdateRequestDTO userAccountStatusUpdateRequestDTO) {
-        // not yet implemented
-    }
-
-    /**
-     * TODO: Implement password reset trigger for a user.
-     *
-     * @param userId user ID
-     */
-    @Override
-    public void triggerResetPassword(Long userId) {
-        // not yet implemented
-    }
 
     /**
      * Helper method that maps a row in the ResultSet to a {@link User} object,

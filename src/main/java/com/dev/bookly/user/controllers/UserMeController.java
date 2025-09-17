@@ -5,6 +5,7 @@ import com.dev.bookly.user.dtos.requests.UserChangePasswordRequestDTO;
 import com.dev.bookly.user.dtos.requests.UserUpdateRequestDTO;
 import com.dev.bookly.user.dtos.responses.UserResponseDTO;
 import com.dev.bookly.user.services.UserService;
+import com.dev.bookly.user.validators.PasswordValidator;
 import com.dev.bookly.user.validators.UserUpdateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/me")
 public class UserMeController {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserMeController(UserService userService) {
@@ -27,6 +28,7 @@ public class UserMeController {
     public ResponseEntity<UserResponseDTO> getMyInfo(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
+        System.out.println(userDetails.getUsername());
         UserResponseDTO userResponseDTO = userService.getUserById(((UserDetailsImpl) userDetails).getId());
         return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
     }
@@ -46,6 +48,8 @@ public class UserMeController {
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserChangePasswordRequestDTO userChangePasswordRequestDTO
     ) {
+        PasswordValidator.validate(userChangePasswordRequestDTO);
+        userService.updateUserPassword(((UserDetailsImpl) userDetails).getId(), userChangePasswordRequestDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
