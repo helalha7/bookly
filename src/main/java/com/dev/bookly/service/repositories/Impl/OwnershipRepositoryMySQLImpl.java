@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 @Repository()
 public class OwnershipRepositoryMySQLImpl implements OwnershipRepository {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public OwnershipRepositoryMySQLImpl(DataSource dataSource ) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -43,7 +43,7 @@ public class OwnershipRepositoryMySQLImpl implements OwnershipRepository {
     @Override
     public boolean userOwnsResource(Long businessId, Long serviceId, Long resourceId, String username) {
         String sql = """
-            SELECT COUNT(*) 
+            SELECT COUNT(*)
             FROM resources r
             JOIN services s ON r.service_id = s.id
             JOIN businesses b ON s.business_id = b.id

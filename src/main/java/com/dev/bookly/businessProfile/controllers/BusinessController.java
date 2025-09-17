@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/businesses")
+@RequestMapping("/api/businesses")
 public class BusinessController {
 
     private BusinessServiceImpl businessServiceImpl;
