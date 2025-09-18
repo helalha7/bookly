@@ -1,7 +1,9 @@
 package com.dev.bookly.scheduling.services.impl;
 
 import com.dev.bookly.scheduling.domains.BusinessShift;
+import com.dev.bookly.scheduling.domains.ResourceShift;
 import com.dev.bookly.scheduling.dtos.BusinessShiftMapper;
+import com.dev.bookly.scheduling.dtos.ResourceShiftMapper;
 import com.dev.bookly.scheduling.repository.BusinessShiftRepository;
 import com.dev.bookly.scheduling.repository.ResourceShiftRepository;
 import com.dev.bookly.scheduling.services.ShiftService;
@@ -62,12 +64,33 @@ public class ShiftServiceImpl implements ShiftService {
 
 
     @Override
-    public List<ResourceShiftDTO> listResourceShifts(Long resourceId) {
-        return List.of();
+    public List<ResourceShiftDTO> listResourceShifts(Long businessId , Long resourceId) {
+        List<ResourceShift> list = resourceShiftRepository.findByResourceId(resourceId);
+        List<ResourceShiftDTO> ResourceShiftDTOList = new ArrayList<>();
+        for(ResourceShift shift : list){
+            ResourceShiftDTOList.add(ResourceShiftMapper.toResourceShiftDTO(shift));
+        }
+        return ResourceShiftDTOList;
     }
 
     @Override
     public ResourceShiftDTO upsertResourceShift(Long resourceId, ResourceShiftDTO dto) {
-        return null;
+        ResourceShift resourceShift = ResourceShiftMapper.toResourceShift(resourceId , dto);
+        ResourceShift resourceShift1 = resourceShiftRepository.save(resourceShift);
+        ResourceShiftDTO resourceShiftDTO = ResourceShiftMapper.toResourceShiftDTO(resourceShift1);
+        return  resourceShiftDTO;
+    }
+
+    @Override
+    public ResourceShiftDTO updateResourceShift(Long resourceId, Long shiftId, ResourceShiftDTO dto) {
+        ResourceShift resourceShift = ResourceShiftMapper.toResourceShift(resourceId , dto);
+        ResourceShift resourceShift1 = resourceShiftRepository.update(shiftId , resourceShift);
+        ResourceShiftDTO resourceShiftDTO = ResourceShiftMapper.toResourceShiftDTO(resourceShift1);
+        return  resourceShiftDTO;
+    }
+
+    @Override
+    public void deleteResourceShift(Long resourceId, Long shiftId) {
+        resourceShiftRepository.delete(resourceId , shiftId);
     }
 }

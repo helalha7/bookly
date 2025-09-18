@@ -12,4 +12,8 @@ public interface ResourceShiftRepository {
     List<ResourceShift> findEffectiveResourceAndDate(Long resourceId , LocalDate date);
 
     ResourceShift save(ResourceShift resourceShift);
+
+    ResourceShift update(Long shiftId , ResourceShift resourceShift);
+
+    void delete(Long resourceId , Long shiftId);
 }

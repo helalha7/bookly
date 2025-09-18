@@ -56,9 +56,9 @@ public class BusinessShiftRepositoryImpl implements BusinessShiftRepository {
     public BusinessShift update(Long shiftId, BusinessShift businessShift) {
         String query =
                 """
-                   update business_shifts set slot_no = ? , start_time = ? , end_time = ? where id = ? AND business_id = ? ;     
+                   update business_shifts set day_of_week = ? , slot_no = ? , start_time = ? , end_time = ? where id = ? AND business_id = ? ;     
                 """;
-        jdbcTemplate.update(query,businessShift.getSlotNo() , businessShift.getStartTime() , businessShift.getEndTime() , shiftId ,businessShift.getBusinessId());
+        jdbcTemplate.update(query, businessShift.getDayOfWeek(), businessShift.getSlotNo() , businessShift.getStartTime() , businessShift.getEndTime() , shiftId ,businessShift.getBusinessId());
 //        businessShift.setId(shiftId);
         return businessShift;
     }

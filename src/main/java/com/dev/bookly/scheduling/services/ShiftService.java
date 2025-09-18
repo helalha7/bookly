@@ -15,7 +15,11 @@ public interface ShiftService {
 
     void deleteBusinessShift(Long businessId ,Long shiftId);
 
-    List<ResourceShiftDTO>  listResourceShifts(Long resourceId);
+    List<ResourceShiftDTO>  listResourceShifts(Long businessId ,Long resourceId);
 
     ResourceShiftDTO upsertResourceShift(Long resourceId ,ResourceShiftDTO dto);
+
+    ResourceShiftDTO updateResourceShift(Long resourceId, Long shiftId ,ResourceShiftDTO dto);
+
+    void deleteResourceShift(Long resourceId ,Long shiftId);
 }
