@@ -15,7 +15,7 @@ public class UserResponseDTO {
     private final List<RoleDTO> roles;
     private final String city;
     private final String street;
-    private final int houseNumber;
+    private final Integer houseNumber;
 
     public UserResponseDTO(
             Long id,
@@ -27,7 +27,7 @@ public class UserResponseDTO {
             List<RoleDTO> roles,
             String city,
             String street,
-            int houseNumber
+            Integer houseNumber
     ) {
         this.id = id;
         this.firstName = firstName;
@@ -73,7 +73,7 @@ public class UserResponseDTO {
         return city;
     }
 
-    public int getHouseNumber() {
+    public Integer getHouseNumber() {
         return houseNumber;
     }
 

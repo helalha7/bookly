@@ -35,13 +35,13 @@ public class BusinessController {
     }
 
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<BusinessResponseDTO> getBusinessById(@PathVariable Long businessId,@AuthenticationPrincipal UserDetails userDetails){
-//
-//        BusinessResponseDTO businessResponseDTO = businessServiceImpl.get(((UserDetailsImpl) userDetails).getId(),businessId);
-//
-//        return new ResponseEntity<>(businessResponseDTO, HttpStatus.OK);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<BusinessResponseDTO> getBusinessById(@PathVariable Long id){
+
+        BusinessResponseDTO businessResponseDTO = businessServiceImpl.get(id);
+
+        return new ResponseEntity<>(businessResponseDTO, HttpStatus.OK);
+    }
 
 
     @PostMapping
@@ -67,6 +67,15 @@ public class BusinessController {
     public ResponseEntity<BusinessResponseDTO> status(@PathVariable Long id,@RequestParam("active")  Boolean active, @AuthenticationPrincipal UserDetails userDetails){
         BusinessResponseDTO responseDTO = businessServiceImpl.status(id, active, ((UserDetailsImpl) userDetails).getId());
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String delete(@PathVariable Long id){
+
+         businessServiceImpl.delete(id);
+
+        return "Business with id " + id + " was deleted successfully";
+
     }
 
 
