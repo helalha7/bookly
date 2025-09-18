@@ -40,4 +40,10 @@ public class UserDetailsImpl implements UserDetails {
     public Long getId() {
         return user.getId();
     }
+
+    public boolean isAdmin() {
+        return getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ADMIN")
+                        || auth.getAuthority().equals("ROLE_ADMIN"));
+    }
 }
