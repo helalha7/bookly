@@ -1,11 +1,13 @@
 package com.dev.bookly.service.repositories;
 
+import com.dev.bookly.global.pagination.PageResponseDTO;
+import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.service.domain.Resource;
 
 import java.util.List;
 
 public interface ResourceRepository {
-    List<Resource> findByServiceId(Long serviceId);
+    PageResult<Resource> findByServiceId(Long serviceId, int offset, int limit);
 
     Resource save(Resource resource);
 

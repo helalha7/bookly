@@ -7,12 +7,12 @@ public class Service {
     private Long businessId;
     private String name;
     private String description;
-    private int durationMins;
-    private double price;
-    private boolean active;
+    private Integer durationMins;
+    private Double price;
+    private Boolean active;
     private Date createdAt;
 
-    public Service(Long id, Long businessId, String name, String description, int durationMins, double price, boolean active, Date createdAt) {
+    public Service(Long id, Long businessId, String name, String description, Integer durationMins, Double price, Boolean active, Date createdAt) {
         this.id = id;
         this.businessId = businessId;
         this.name = name;
@@ -59,7 +59,7 @@ public class Service {
         this.description = description;
     }
 
-    public int getDurationMins() {
+    public Integer getDurationMins() {
         return durationMins;
     }
 
@@ -67,7 +67,7 @@ public class Service {
         this.durationMins = durationMins;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
@@ -75,7 +75,7 @@ public class Service {
         this.price = price;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return active;
     }
 

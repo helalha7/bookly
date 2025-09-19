@@ -7,9 +7,9 @@ public class Resource {
     private Long id;
     private Long serviceId;
     private String name;
-    private int capacity;
+    private Integer capacity;
 
-    public Resource(Long id, Long serviceId, String name, int capacity) {
+    public Resource(Long id, Long serviceId, String name, Integer capacity) {
         this.id = id;
         this.serviceId = serviceId;
         this.name = name;
@@ -40,7 +40,7 @@ public class Resource {
         this.name = name;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 
