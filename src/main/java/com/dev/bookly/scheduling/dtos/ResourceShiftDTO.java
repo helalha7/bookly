@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class ResourceShiftDTO {
@@ -27,13 +28,19 @@ public class ResourceShiftDTO {
 
     private final LocalDate effectiveTo;
 
-    public ResourceShiftDTO(Short slotNo, Short dayOfWeek, LocalTime startTime, LocalTime endTime, LocalDate effectiveFrom, LocalDate effectiveTo) {
+    private final LocalDateTime updatedAt;
+    private final LocalDateTime createdAt;
+
+    public ResourceShiftDTO(Short slotNo, Short dayOfWeek, LocalTime startTime, LocalTime endTime,
+                            LocalDate effectiveFrom, LocalDate effectiveTo , LocalDateTime updatedAt , LocalDateTime createdAt) {
         this.slotNo = slotNo;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
         this.effectiveFrom = effectiveFrom;
         this.effectiveTo = effectiveTo;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
 
     public Short getSlotNo() {
@@ -58,5 +65,13 @@ public class ResourceShiftDTO {
 
     public LocalDate getEffectiveTo() {
         return effectiveTo;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

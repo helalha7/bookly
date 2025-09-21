@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class BusinessShiftDTO {
@@ -21,11 +22,17 @@ public class BusinessShiftDTO {
     @NotNull(message = "End time cannot be null")
     private final LocalTime endTime;
 
-    public BusinessShiftDTO(Short slotNo, Short dayOfWeek, LocalTime startTime, LocalTime endTime) {
+    private final LocalDateTime updatedAt;
+    private final LocalDateTime createdAt;
+
+
+    public BusinessShiftDTO(Short slotNo, Short dayOfWeek, LocalTime startTime, LocalTime endTime , LocalDateTime updatedAt , LocalDateTime createdAt) {
         this.slotNo = slotNo;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
 
     public Short getSlotNo() {
@@ -42,5 +49,13 @@ public class BusinessShiftDTO {
 
     public LocalTime getEndTime() {
         return endTime;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

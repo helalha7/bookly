@@ -1,6 +1,7 @@
 package com.dev.bookly.scheduling.domains;
 
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class BusinessShift {
@@ -11,15 +12,20 @@ public class BusinessShift {
     private Short dayOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
 
 
-    public BusinessShift(Long id, Long businessId, Short slotNo, Short dayOfWeek, LocalTime startTime, LocalTime endTime) {
+    public BusinessShift(Long id, Long businessId, Short slotNo, Short dayOfWeek,
+                         LocalTime startTime, LocalTime endTime ,  LocalDateTime updatedAt, LocalDateTime createdAt) {
         this.id = id;
         this.businessId = businessId;
         this.slotNo = slotNo;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -70,6 +76,22 @@ public class BusinessShift {
         this.endTime = endTime;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "BusinessShift{" +
@@ -79,6 +101,10 @@ public class BusinessShift {
                 ", dayOfWeek=" + dayOfWeek +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
+                ", updatedAt=" + updatedAt +
+                ", createdAt=" + createdAt +
                 '}';
     }
+
+
 }

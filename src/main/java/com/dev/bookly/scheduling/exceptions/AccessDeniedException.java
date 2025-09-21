@@ -1,7 +1,7 @@
 package com.dev.bookly.scheduling.exceptions;
 
-public class AccessDeniedException extends RuntimeException{
+public class AccessDeniedException extends SchedulingException{
     public AccessDeniedException(String message){
-        super(message);
+        super(message , "ACCESS_DENIED");
     }
 }

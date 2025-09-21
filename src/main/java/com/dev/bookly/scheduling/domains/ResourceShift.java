@@ -1,6 +1,7 @@
 package com.dev.bookly.scheduling.domains;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class ResourceShift {
@@ -13,8 +14,11 @@ public class ResourceShift {
     private LocalTime endTime;
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
 
-    public ResourceShift(Long id, Long resourceId, Short slotNo, Short dayOfWeek, LocalTime startTime, LocalTime endTime, LocalDate effectiveFrom, LocalDate effectiveTo) {
+    public ResourceShift(Long id, Long resourceId, Short slotNo, Short dayOfWeek, LocalTime startTime,
+                         LocalTime endTime, LocalDate effectiveFrom, LocalDate effectiveTo , LocalDateTime updatedAt, LocalDateTime createdAt) {
         this.id = id;
         this.resourceId = resourceId;
         this.slotNo = slotNo;
@@ -23,6 +27,8 @@ public class ResourceShift {
         this.endTime = endTime;
         this.effectiveFrom = effectiveFrom;
         this.effectiveTo = effectiveTo;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -95,6 +101,21 @@ public class ResourceShift {
                 && (effectiveTo == null || !date.isAfter(effectiveTo));
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
@@ -107,6 +128,8 @@ public class ResourceShift {
                 ", endTime=" + endTime +
                 ", effectiveFrom=" + effectiveFrom +
                 ", effectiveTo=" + effectiveTo +
+                ", updatedAt=" + updatedAt +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

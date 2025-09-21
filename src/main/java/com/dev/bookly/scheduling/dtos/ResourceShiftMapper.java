@@ -13,7 +13,9 @@ public class ResourceShiftMapper {
                 dto.getStartTime(),
                 dto.getEndTime(),
                 dto.getEffectiveFrom(),
-                dto.getEffectiveTo()
+                dto.getEffectiveTo(),
+                dto.getUpdatedAt(),
+                dto.getCreatedAt()
         );
         return resourceShift;
     }
@@ -26,7 +28,9 @@ public class ResourceShiftMapper {
                 shift.getStartTime(),
                 shift.getEndTime(),
                 shift.getEffectiveFrom(),
-                shift.getEffectiveTo()
+                shift.getEffectiveTo(),
+                shift.getUpdatedAt(),
+                shift.getCreatedAt()
         );
         return dto;
     }

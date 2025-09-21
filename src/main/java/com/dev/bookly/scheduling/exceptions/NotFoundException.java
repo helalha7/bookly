@@ -1,8 +1,8 @@
 package com.dev.bookly.scheduling.exceptions;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends SchedulingException {
     public NotFoundException(String message) {
-        super(message);
+        super(message , "RESOURCE_NOT_FOUND");
     }
 
 }

@@ -4,6 +4,8 @@ import com.dev.bookly.scheduling.dtos.BusinessShiftDTO;
 import com.dev.bookly.scheduling.dtos.ResourceShiftDTO;
 import com.dev.bookly.scheduling.exceptions.InvalidShiftTimeException;
 
+import java.time.LocalDate;
+
 public class ShiftValidator {
 
     /**
@@ -49,21 +51,22 @@ public class ShiftValidator {
             throw new InvalidShiftTimeException("Slot number must be positive");
         }
 
-        if (dto.getStartTime() == null || dto.getEndTime() == null) {
-            throw new InvalidShiftTimeException("Start time and end time cannot be null");
-        }
-
+        // ---- Cross-field only ----
         if (!dto.getStartTime().isBefore(dto.getEndTime())) {
             throw new InvalidShiftTimeException("Shift start time must be before end time");
         }
 
-        // Validate effective dates
-        if (dto.getEffectiveFrom() != null || dto.getEffectiveTo() != null) {
-            if (dto.getEffectiveFrom() == null || dto.getEffectiveTo() == null) {
-                throw new InvalidShiftTimeException("Both effectiveFrom and effectiveTo must be provided");
-            }
+        // ---- Effective dates ----
+        if (dto.getEffectiveFrom() == null) {
+            throw new InvalidShiftTimeException("effectiveFrom cannot be null");
+        }
+
+        if (dto.getEffectiveTo() != null) {
             if (dto.getEffectiveFrom().isAfter(dto.getEffectiveTo())) {
                 throw new InvalidShiftTimeException("effectiveFrom must be before or equal to effectiveTo");
+            }
+            if (dto.getEffectiveTo().isBefore(LocalDate.now())) {
+                throw new InvalidShiftTimeException("effectiveTo cannot be in the past");
             }
         }
     }

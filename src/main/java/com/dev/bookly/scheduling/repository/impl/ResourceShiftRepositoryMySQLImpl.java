@@ -29,6 +29,11 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
                 """;
 
         List<ResourceShift> shifts = jdbcTemplate.query(query, (rs, rowNum) -> {
+
+            LocalDate effectiveTo = rs.getDate("effective_to") != null
+                    ? rs.getDate("effective_to").toLocalDate()
+                    : null;
+
             return new ResourceShift(
                     rs.getLong("id"),
                     rs.getLong("resource_id"),
@@ -37,7 +42,9 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
                     rs.getTime("start_time").toLocalTime(),
                     rs.getTime("end_time").toLocalTime(),
                     rs.getDate("effective_from").toLocalDate(),
-                    rs.getDate("effective_to").toLocalDate()
+                    effectiveTo,
+                    rs.getTimestamp("updated_at").toLocalDateTime(),
+                    rs.getTimestamp("created_at").toLocalDateTime()
             );
         }, resourceId);
 
@@ -46,11 +53,30 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
 
     @Override
     public List<ResourceShift> findEffectiveResourceAndDate(Long resourceId, LocalDate date) {
-        return List.of();
+        String query = """
+        SELECT * FROM resource_shifts
+        WHERE resource_id = ?
+          AND day_of_week = ?
+          AND effective_from <= ?
+          AND (effective_to IS NULL OR effective_to >= ?)
+    """;
+
+        return jdbcTemplate.query(query, (rs, rowNum) -> new ResourceShift(
+                rs.getLong("id"),
+                rs.getLong("resource_id"),
+                rs.getShort("slot_no"),
+                rs.getShort("day_of_week"),
+                rs.getTime("start_time").toLocalTime(),
+                rs.getTime("end_time").toLocalTime(),
+                rs.getDate("effective_from").toLocalDate(),
+                rs.getDate("effective_to") != null ? rs.getDate("effective_to").toLocalDate() : null,
+                rs.getTimestamp("updated_at").toLocalDateTime(),
+                rs.getTimestamp("created_at").toLocalDateTime()
+        ), resourceId, (short) date.getDayOfWeek().getValue(), date, date);
     }
 
     @Override
-    public ResourceShift save(ResourceShift resourceShift) {
+    public Optional<ResourceShift> save(ResourceShift resourceShift) {
 
         String query =
                 """
@@ -58,9 +84,10 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
                 """;
         jdbcTemplate.update(query,resourceShift.getResourceId() , resourceShift.getDayOfWeek() , resourceShift.getSlotNo() , resourceShift.getStartTime()
                 , resourceShift.getEndTime(), resourceShift.getEffectiveFrom(), resourceShift.getEffectiveTo());
-//        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
-//        resourceShift.setId(id);
-        return resourceShift;
+
+        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+
+        return findResourceShiftById(resourceShift.getResourceId(), id);
     }
 
     @Override
@@ -70,8 +97,16 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
                    update resource_shifts set day_of_week = ? , slot_no = ?, start_time = ? , end_time = ?, effective_from = ? , effective_to = ?
                     where id = ? AND resource_id = ? ;
                 """;
-        return jdbcTemplate.update(query, resourceShift.getDayOfWeek() , resourceShift.getSlotNo() , resourceShift.getStartTime()
-        ,resourceShift.getEndTime(), resourceShift.getEffectiveFrom(), resourceShift.getEffectiveTo(), shiftId , resourceShift.getResourceId());
+        return jdbcTemplate.update(query,
+                resourceShift.getDayOfWeek(),
+                resourceShift.getSlotNo(),
+                resourceShift.getStartTime(),
+                resourceShift.getEndTime(),
+                resourceShift.getEffectiveFrom(),
+                resourceShift.getEffectiveTo(),
+                shiftId,
+                resourceShift.getResourceId()
+        );
     }
 
     @Override
@@ -91,19 +126,45 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
         WHERE resource_id = ?
           AND day_of_week = ?
           AND (
-               (start_time < ? AND end_time > ?)
-            OR (start_time < ? AND end_time > ?)
-            OR (start_time >= ? AND end_time <= ?)
+               (start_time < ? AND end_time > ?)   -- existing spans new start
+            OR (start_time < ? AND end_time > ?)   -- existing spans new end
+            OR (start_time >= ? AND end_time <= ?) -- existing inside new shift
+            OR (start_time <= ? AND end_time >= ?) -- new shift fully covers existing
           )
     """;
 
-        Integer count = jdbcTemplate.queryForObject(
-                query,
-                Integer.class,
-                resourceId,
-                dayOfWeek,
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class,
+                resourceId, dayOfWeek,
                 endTime, startTime,
                 endTime, startTime,
+                startTime, endTime,
+                startTime, endTime
+        );
+
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsOverlapExcludingId(Long shiftId, Long resourceId, short dayOfWeek, LocalTime startTime, LocalTime endTime) {
+        String query = """
+        SELECT COUNT(*)
+        FROM resource_shifts
+        WHERE resource_id = ?
+          AND day_of_week = ?
+          AND id <> ? -- exclude current shift
+          AND (
+               (start_time < ? AND end_time > ?)   -- existing spans new start
+            OR (start_time < ? AND end_time > ?)   -- existing spans new end
+            OR (start_time >= ? AND end_time <= ?) -- existing inside new shift
+            OR (start_time <= ? AND end_time >= ?) -- new shift fully covers existing
+          )
+    """;
+
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class,
+                resourceId, dayOfWeek, shiftId,
+                endTime, startTime,
+                endTime, startTime,
+                startTime, endTime,
                 startTime, endTime
         );
 
@@ -114,20 +175,29 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
     public Optional<ResourceShift> findResourceShiftById(Long resourceId, Long shiftId) {
         String query =
                 """
-                SELECT * FROM resource_shifts 
+                SELECT * FROM resource_shifts
                 WHERE id = ? AND resource_id = ?;
                 """;
 
-        List<ResourceShift> result = jdbcTemplate.query(query, (rs, rowNum) -> new ResourceShift(
-                rs.getLong("id"),
-                rs.getLong("resource_id"),
-                rs.getShort("slot_no"),
-                rs.getShort("day_of_week"),
-                rs.getTime("start_time").toLocalTime(),
-                rs.getTime("end_time").toLocalTime(),
-                rs.getDate("effective_from").toLocalDate(),
-                rs.getDate("effective_to").toLocalDate()
-        ), shiftId, resourceId);
+        List<ResourceShift> result = jdbcTemplate.query(query, (rs, rowNum) -> {
+
+            LocalDate effectiveTo = rs.getDate("effective_to") != null
+                    ? rs.getDate("effective_to").toLocalDate()
+                    : null;
+
+            return new ResourceShift(
+                    rs.getLong("id"),
+                    rs.getLong("resource_id"),
+                    rs.getShort("slot_no"),
+                    rs.getShort("day_of_week"),
+                    rs.getTime("start_time").toLocalTime(),
+                    rs.getTime("end_time").toLocalTime(),
+                    rs.getDate("effective_from").toLocalDate(),
+                    effectiveTo,
+                    rs.getTimestamp("updated_at").toLocalDateTime(),
+                    rs.getTimestamp("created_at").toLocalDateTime()
+            );
+        }, shiftId, resourceId);
 
         return result.stream().findFirst();
     }

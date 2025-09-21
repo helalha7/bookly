@@ -26,7 +26,7 @@ public interface BusinessShiftRepository {
      * @param businessShift the shift entity to save
      * @return the saved BusinessShift
      */
-    BusinessShift save(BusinessShift businessShift);
+    Optional<BusinessShift> save(BusinessShift businessShift);
 
     /**
      * Update an existing shift belonging to a business.
@@ -59,6 +59,19 @@ public interface BusinessShiftRepository {
     boolean existsOverlap(Long businessId, short dayOfWeek, LocalTime startTime, LocalTime endTime);
 
     /**
+     * Check if an updated shift overlaps with existing shifts for the same business and day without the same shift.
+     * Two shifts are considered overlapping if their time ranges intersect.
+     *
+     * @param shiftId the ID of the business shift
+     * @param businessId the ID of the business
+     * @param dayOfWeek  the day of the week (0-6 or 1-7 depending on your convention)
+     * @param startTime  the start time of the new shift
+     * @param endTime    the end time of the new shift
+     * @return true if there is an overlap, false otherwise
+     */
+    boolean existsOverlapExcludingId(Long shiftId , Long businessId, short dayOfWeek, LocalTime startTime, LocalTime endTime);
+
+    /**
      * Find a specific business shift by its ID and business ID.
      *
      * @param businessId the ID of the business
@@ -66,5 +79,16 @@ public interface BusinessShiftRepository {
      * @return an Optional containing the BusinessShift if found, otherwise empty
      */
     Optional<BusinessShift> findBusinessShiftById(Long businessId, Long shiftId);
+
+    /**
+     * Find a specific business shift by its business ID and day of week and slot number.
+     *
+     * @param businessId the ID of the business
+     * @param dayOfWeek    the day of the week (1-7)
+     * @param slotNo    the number of the slot (>=1)
+     * @return an Optional containing the BusinessShift if found, otherwise empty
+     */
+    Optional<BusinessShift> findByBusinessIdAndDayAndSlot(Long businessId, short dayOfWeek, short slotNo);
+
 
 }

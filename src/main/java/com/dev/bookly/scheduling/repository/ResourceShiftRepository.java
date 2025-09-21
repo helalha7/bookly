@@ -38,7 +38,7 @@ public interface ResourceShiftRepository {
      * @param resourceShift the shift entity to save
      * @return the saved ResourceShift
      */
-    ResourceShift save(ResourceShift resourceShift);
+    Optional<ResourceShift> save(ResourceShift resourceShift);
 
     /**
      * Update an existing resource shift.
@@ -61,7 +61,6 @@ public interface ResourceShiftRepository {
     /**
      * Check if a new shift overlaps with existing shifts for the same resource and day.
      * Two shifts are considered overlapping if their time ranges intersect.
-     *
      * @param resourceId the ID of the resource
      * @param dayOfWeek  the day of the week (0-6 or 1-7 depending on your convention)
      * @param startTime  the start time of the new shift
@@ -69,6 +68,18 @@ public interface ResourceShiftRepository {
      * @return true if there is an overlap, false otherwise
      */
     boolean existsOverlap(Long resourceId, short dayOfWeek, LocalTime startTime, LocalTime endTime);
+
+    /**
+     * Check if an updated shift overlaps with existing shifts for the same resource and day without the same shift.
+     * Two shifts are considered overlapping if their time ranges intersect.
+     * @param shiftId the ID of the shift
+     * @param resourceId the ID of the resource
+     * @param dayOfWeek  the day of the week (0-6 or 1-7 depending on your convention)
+     * @param startTime  the start time of the new shift
+     * @param endTime    the end time of the new shift
+     * @return true if there is an overlap, false otherwise
+     */
+    boolean existsOverlapExcludingId(Long shiftId , Long resourceId, short dayOfWeek, LocalTime startTime, LocalTime endTime);
 
     /**
      * Find a specific resource shift by its ID and resource ID.

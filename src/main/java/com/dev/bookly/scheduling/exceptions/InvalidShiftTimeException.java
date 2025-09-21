@@ -1,7 +1,7 @@
 package com.dev.bookly.scheduling.exceptions;
 
-public class InvalidShiftTimeException extends RuntimeException {
+public class InvalidShiftTimeException extends SchedulingException {
     public InvalidShiftTimeException(String message) {
-        super(message);
+        super(message , "INVALID_SHIFT_TIME");
     }
 }

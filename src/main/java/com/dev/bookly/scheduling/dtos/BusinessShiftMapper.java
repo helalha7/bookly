@@ -14,7 +14,9 @@ public class BusinessShiftMapper {
                 dto.getSlotNo(),
                 dto.getDayOfWeek(),
                 dto.getStartTime(),
-                dto.getEndTime()
+                dto.getEndTime(),
+                dto.getUpdatedAt(),
+                dto.getCreatedAt()
         );
         return businessShift;
     }
@@ -25,7 +27,9 @@ public class BusinessShiftMapper {
                 shift.getSlotNo(),
                 shift.getDayOfWeek(),
                 shift.getStartTime(),
-                shift.getEndTime()
+                shift.getEndTime(),
+                shift.getUpdatedAt(),
+                shift.getCreatedAt()
         );
         return dto;
     }

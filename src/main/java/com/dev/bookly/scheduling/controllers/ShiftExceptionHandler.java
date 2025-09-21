@@ -38,74 +38,102 @@ public class ShiftExceptionHandler {
         return new ResponseEntity<>(dto, status);
     }
 
-    /**
-     * Handle authorization errors when the user does not own the resource.
-     */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        return buildResponse(ex, "ACCESS_DENIED", HttpStatus.FORBIDDEN, request);
+    @ExceptionHandler(SchedulingException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleSchedulingException(
+            SchedulingException ex, HttpServletRequest request) {
+
+        //Handle invalid shift time errors (e.g., start >= end).
+        //Handle invalid effective dates errors (e.g., from >= to).
+        //Handle when JSON is bad bean validation failed.
+        //Handle when JSON is bad malformed JSON.
+        //Handle when JSON is bad malformed wrong type (e.g. "abc" for dayOfWeek).
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        if (ex instanceof AccessDeniedException) status = HttpStatus.FORBIDDEN; //Handle authorization errors when the user does not own the resource.
+        else if (ex instanceof NotFoundException) status = HttpStatus.NOT_FOUND; //Handle resource not found errors.
+        else if (ex instanceof OverlappingShiftException) status = HttpStatus.CONFLICT; //Handle overlapping shift errors.
+        else if (ex instanceof DuplicateShiftException) status = HttpStatus.CONFLICT; //Handle when they are duplicate "resource" and "day of week" and "slot number".
+
+        return buildResponse(ex, ex.getErrorCode(), status, request);
     }
 
-
-    /**
-     * Handle resource not found errors.
-     */
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleNotFound(NotFoundException ex, HttpServletRequest request) {
-        return buildResponse(ex, "RESOURCE_NOT_FOUND", HttpStatus.NOT_FOUND, request);
-    }
-
-    /**
-     * Handle invalid shift time errors (e.g., start >= end).
-     */
-    @ExceptionHandler(InvalidShiftTimeException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleInvalidShift(InvalidShiftTimeException ex, HttpServletRequest request) {
-        return buildResponse(ex, "INVALID_SHIFT_TIME", HttpStatus.BAD_REQUEST, request);
-    }
-
-    /**
-     * Handle overlapping shift errors.
-     */
-    @ExceptionHandler(OverlappingShiftException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleOverlap(OverlappingShiftException ex, HttpServletRequest request) {
-        return buildResponse(ex, "SHIFT_OVERLAP", HttpStatus.CONFLICT, request);
-    }
-
-    /**
-     * Handle invalid effective dates errors (e.g., from >= to).
-     */
-    @ExceptionHandler(InvalidEffectiveDates.class)
-    public ResponseEntity<ExceptionResponseDTO> InvalidEffectiveDates(InvalidEffectiveDates ex, HttpServletRequest request) {
-        return buildResponse(ex, "INVALID_EFFECTIVE_DATES", HttpStatus.BAD_REQUEST, request);
-    }
-
-    /**
-     * Handle when JSON is bad bean validation failed.
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleValidationErrors(
-            MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        return buildResponse(ex, message, HttpStatus.BAD_REQUEST, request);
-    }
-
-    /**
-     * Handle when JSON is bad malformed JSON.
-     */
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleBadJson(
-            HttpMessageNotReadableException ex, HttpServletRequest request) {
-        return buildResponse(ex, "Malformed JSON request", HttpStatus.BAD_REQUEST, request);
-    }
-
-    /**
-     * Handle when JSON is bad malformed wrong type (e.g. "abc" for dayOfWeek).
-     */
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ExceptionResponseDTO> handleTypeMismatch(
-            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
-        String message = String.format("Invalid value for parameter '%s': %s",
-                ex.getName(), ex.getValue());
-        return buildResponse(ex, message, HttpStatus.BAD_REQUEST, request);
-    }
+//    /**
+//     * Handle authorization errors when the user does not own the resource.
+//     */
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+//        return buildResponse(ex, "ACCESS_DENIED", HttpStatus.FORBIDDEN, request);
+//    }
+//
+//
+//    /**
+//     * Handle resource not found errors.
+//     */
+//    @ExceptionHandler(NotFoundException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleNotFound(NotFoundException ex, HttpServletRequest request) {
+//        return buildResponse(ex, "RESOURCE_NOT_FOUND", HttpStatus.NOT_FOUND, request);
+//    }
+//
+//    /**
+//     * Handle invalid shift time errors (e.g., start >= end).
+//     */
+//    @ExceptionHandler(InvalidShiftTimeException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleInvalidShift(InvalidShiftTimeException ex, HttpServletRequest request) {
+//        return buildResponse(ex, "INVALID_SHIFT_TIME", HttpStatus.BAD_REQUEST, request);
+//    }
+//
+//    /**
+//     * Handle overlapping shift errors.
+//     */
+//    @ExceptionHandler(OverlappingShiftException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleOverlap(OverlappingShiftException ex, HttpServletRequest request) {
+//        return buildResponse(ex, "SHIFT_OVERLAP", HttpStatus.CONFLICT, request);
+//    }
+//
+//    /**
+//     * Handle invalid effective dates errors (e.g., from >= to).
+//     */
+//    @ExceptionHandler(InvalidEffectiveDates.class)
+//    public ResponseEntity<ExceptionResponseDTO> InvalidEffectiveDates(InvalidEffectiveDates ex, HttpServletRequest request) {
+//        return buildResponse(ex, "INVALID_EFFECTIVE_DATES", HttpStatus.BAD_REQUEST, request);
+//    }
+//
+//    /**
+//     * Handle when JSON is bad bean validation failed.
+//     */
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleValidationErrors(
+//            MethodArgumentNotValidException ex, HttpServletRequest request) {
+//        String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+//        return buildResponse(ex, message, HttpStatus.BAD_REQUEST, request);
+//    }
+//
+//    /**
+//     * Handle when JSON is bad malformed JSON.
+//     */
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleBadJson(
+//            HttpMessageNotReadableException ex, HttpServletRequest request) {
+//        return buildResponse(ex, "Malformed JSON request", HttpStatus.BAD_REQUEST, request);
+//    }
+//
+//    /**
+//     * Handle when JSON is bad malformed wrong type (e.g. "abc" for dayOfWeek).
+//     */
+//    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleTypeMismatch(
+//            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+//        String message = String.format("Invalid value for parameter '%s': %s",
+//                ex.getName(), ex.getValue());
+//        return buildResponse(ex, message, HttpStatus.BAD_REQUEST, request);
+//    }
+//
+//    /**
+//     * Handle when they are duplicate "resource" and "day of week" and "slot number".
+//     */
+//    @ExceptionHandler(DuplicateShiftException.class)
+//    public ResponseEntity<ExceptionResponseDTO> handleDuplicateShift(
+//            DuplicateShiftException ex, HttpServletRequest request) {
+//        return buildResponse(ex, "DUPLICATE_SHIFT", HttpStatus.CONFLICT, request);
+//    }
 }

@@ -35,7 +35,9 @@ public class BusinessShiftRepositoryMySQLImpl implements BusinessShiftRepository
                     rs.getShort("slot_no"),
                     rs.getShort("day_of_week"),
                     rs.getTime("start_time").toLocalTime(),
-                    rs.getTime("end_time").toLocalTime()
+                    rs.getTime("end_time").toLocalTime(),
+                    rs.getTimestamp("updated_at").toLocalDateTime(),
+                    rs.getTimestamp("created_at").toLocalDateTime()
             );
         }, businessId);
 
@@ -43,15 +45,16 @@ public class BusinessShiftRepositoryMySQLImpl implements BusinessShiftRepository
     }
 
     @Override
-    public BusinessShift save(BusinessShift businessShift) {
+    public Optional<BusinessShift> save(BusinessShift businessShift) {
         String query =
                 """
                   insert into business_shifts(business_id , slot_no , day_of_week , start_time , end_time) values (? ,? , ?, ? ,?);
                 """;
         jdbcTemplate.update(query,businessShift.getBusinessId() , businessShift.getSlotNo() , businessShift.getDayOfWeek() , businessShift.getStartTime() , businessShift.getEndTime());
-//        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
-//        businessShift.setId(id);
-        return businessShift;
+        //Get auto-generated ID
+        Long shiftId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+
+        return findBusinessShiftById(businessShift.getBusinessId(), shiftId);
     }
 
     @Override
@@ -60,8 +63,15 @@ public class BusinessShiftRepositoryMySQLImpl implements BusinessShiftRepository
                 """
                    update business_shifts set day_of_week = ? , slot_no = ? , start_time = ? , end_time = ? where id = ? AND business_id = ? ;
                 """;
-        return jdbcTemplate.update(query, businessShift.getDayOfWeek(), businessShift.getSlotNo() , businessShift.getStartTime() , businessShift.getEndTime() , shiftId ,businessShift.getBusinessId());
-//        businessShift.setId(shiftId);
+
+        return jdbcTemplate.update(query,
+                businessShift.getDayOfWeek(),
+                businessShift.getSlotNo(),
+                businessShift.getStartTime(),
+                businessShift.getEndTime(),
+                shiftId,
+                businessShift.getBusinessId()
+        );
     }
 
     @Override
@@ -84,6 +94,7 @@ public class BusinessShiftRepositoryMySQLImpl implements BusinessShiftRepository
                (start_time < ? AND end_time > ?)  -- existing shift spans new start
             OR (start_time < ? AND end_time > ?)  -- existing shift spans new end
             OR (start_time >= ? AND end_time <= ?) -- existing shift inside new shift
+            OR (start_time <= ? AND end_time >= ?) -- NEW covers existing
           )
     """;
 
@@ -94,7 +105,39 @@ public class BusinessShiftRepositoryMySQLImpl implements BusinessShiftRepository
                 dayOfWeek,
                 endTime, startTime,   // case 1
                 endTime, startTime,   // case 2
-                startTime, endTime    // case 3
+                startTime, endTime,    // case 3
+                startTime, endTime    // case 4
+        );
+
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsOverlapExcludingId(Long shiftId, Long businessId, short dayOfWeek, LocalTime startTime, LocalTime endTime) {
+        String query = """
+        SELECT COUNT(*)
+        FROM business_shifts
+        WHERE business_id = ?
+          AND day_of_week = ?
+          AND id <> ? -- exclude current shift
+          AND (
+               (start_time < ? AND end_time > ?)  -- existing shift spans new start
+            OR (start_time < ? AND end_time > ?)  -- existing shift spans new end
+            OR (start_time >= ? AND end_time <= ?) -- existing shift inside new shift
+            OR (start_time <= ? AND end_time >= ?) -- NEW covers existing
+          )
+    """;
+
+        Integer count = jdbcTemplate.queryForObject(
+                query,
+                Integer.class,
+                businessId,
+                dayOfWeek,
+                shiftId,
+                endTime, startTime,   // case 1
+                endTime, startTime,   // case 2
+                startTime, endTime,    // case 3
+                startTime, endTime    // case 4
         );
 
         return count != null && count > 0;
@@ -114,8 +157,32 @@ public class BusinessShiftRepositoryMySQLImpl implements BusinessShiftRepository
                 rs.getShort("slot_no"),
                 rs.getShort("day_of_week"),
                 rs.getTime("start_time").toLocalTime(),
-                rs.getTime("end_time").toLocalTime()
+                rs.getTime("end_time").toLocalTime(),
+                rs.getTimestamp("updated_at").toLocalDateTime(),
+                rs.getTimestamp("created_at").toLocalDateTime()
         ), shiftId, businessId);
+
+        return result.stream().findFirst();
+    }
+
+    @Override
+    public Optional<BusinessShift> findByBusinessIdAndDayAndSlot(Long businessId, short dayOfWeek, short slotNo) {
+        String query = """
+        SELECT *
+        FROM business_shifts
+        WHERE business_id = ? AND day_of_week = ? AND slot_no = ?
+    """;
+
+        List<BusinessShift> result = jdbcTemplate.query(query, (rs, rowNum) -> new BusinessShift(
+                rs.getLong("id"),
+                rs.getLong("business_id"),
+                rs.getShort("slot_no"),
+                rs.getShort("day_of_week"),
+                rs.getTime("start_time").toLocalTime(),
+                rs.getTime("end_time").toLocalTime(),
+                rs.getTimestamp("updated_at").toLocalDateTime(),
+                rs.getTimestamp("created_at").toLocalDateTime()
+        ), businessId, dayOfWeek, slotNo);
 
         return result.stream().findFirst();
     }
