@@ -1,5 +1,6 @@
 package com.dev.bookly.service.repositories.Impl;
 
+import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.service.repositories.ServiceRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -38,10 +39,23 @@ public class ServiceRepositoryMySQLImpl implements ServiceRepository {
     );
 
     @Override
-    public List<Service> findByBusiness(Long businessId) {
-        final String sql = "SELECT * FROM services WHERE business_id = ? ORDER BY id";
-        return jdbcTemplate.query(sql, MAPPER, businessId);
+    public PageResult<Service> findByBusiness(Long businessId, int offset, int limit) {
+        final String sql = """
+        SELECT *
+        FROM services
+        WHERE business_id = ?
+        ORDER BY id
+        LIMIT ? OFFSET ?
+        """;
+
+        List<Service> items = jdbcTemplate.query(sql, MAPPER, businessId, limit, offset);
+
+        final String countSql = "SELECT COUNT(*) FROM services WHERE business_id = ?";
+        Long total = jdbcTemplate.queryForObject(countSql, Long.class, businessId);
+
+        return new PageResult<>(items, total != null ? total : 0L);
     }
+
 
     @Override
     public Service findById(Long id) {
@@ -109,6 +123,15 @@ public class ServiceRepositoryMySQLImpl implements ServiceRepository {
         }
 
         return findById(s.getId());
+    }
+
+    @Override
+    public void delete(Long serviceId) {
+        String query =
+                """
+                   delete from services where id = ?     
+                """;
+        jdbcTemplate.update(query,serviceId);
     }
 
 }

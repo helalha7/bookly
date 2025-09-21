@@ -1,23 +1,13 @@
 package com.dev.bookly.service.repositories.Impl;
 
+import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.service.domain.Resource;
 import com.dev.bookly.service.repositories.ResourceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
-import java.util.Objects;
 
 @Repository("ResourceRepoMySQL")
 
@@ -30,23 +20,26 @@ public class ResourceRepositoryMySQLImpl implements ResourceRepository {
     }
 
     @Override
-    public List<Resource> findByServiceId(Long serviceId) {
-        String query =
-                """
-                    SELECT * FROM resources WHERE service_id = ?;
-                """;
+    public PageResult<Resource> findByServiceId(Long serviceId, int offset, int limit) {
+        String query = """
+        SELECT *
+        FROM resources
+        WHERE service_id = ?
+        ORDER BY id
+        LIMIT ? OFFSET ?
+        """;
 
-        List<Resource> resources = jdbcTemplate.query(query, (rs, rowNum) -> {
-            return new Resource(
-                    rs.getLong("id"),
-                    rs.getLong("service_id"),
-                    rs.getString("name"),
-                    rs.getInt("capacity")
+        List<Resource> resources = jdbcTemplate.query(query, (rs, rowNum) -> new Resource(
+                rs.getLong("id"),
+                rs.getLong("service_id"),
+                rs.getString("name"),
+                rs.getInt("capacity")
+        ), serviceId, limit, offset);
 
-            );
-        }, serviceId);
+        String countQuery = "SELECT COUNT(*) FROM resources WHERE service_id = ?";
+        Long total = jdbcTemplate.queryForObject(countQuery, Long.class, serviceId);
 
-        return resources;
+        return new PageResult<>(resources, total != null ? total : 0L);
     }
 
     @Override

@@ -4,9 +4,9 @@ public class ResourceResponseDTO {
     private Long id;
     private Long serviceId;
     private String name;
-    private int capacity;
+    private Integer capacity;
 
-    public ResourceResponseDTO(Long id, Long serviceId, String name, int capacity) {
+    public ResourceResponseDTO(Long id, Long serviceId, String name, Integer capacity) {
         this.id = id;
         this.serviceId = serviceId;
         this.name = name;
@@ -25,7 +25,7 @@ public class ResourceResponseDTO {
         return name;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 }

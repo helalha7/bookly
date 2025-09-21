@@ -8,12 +8,12 @@ public class ServiceResponseDTO {
 
     private final String description;
 
-    private final int durationMins;
-    private final double price;
+    private final Integer durationMins;
+    private final Double price;
 
-    private final boolean active;
+    private final Boolean active;
 
-    public ServiceResponseDTO(Long id, Long businessId, String name, String description, int durationMins, double price, boolean active) {
+    public ServiceResponseDTO(Long id, Long businessId, String name, String description, Integer durationMins, Double price, Boolean active) {
         this.id = id;
         this.businessId = businessId;
         this.name = name;
@@ -39,15 +39,15 @@ public class ServiceResponseDTO {
         return description;
     }
 
-    public int getDurationMins() {
+    public Integer getDurationMins() {
         return durationMins;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return active;
     }
 }

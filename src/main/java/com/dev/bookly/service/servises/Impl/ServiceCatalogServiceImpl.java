@@ -1,9 +1,11 @@
 package com.dev.bookly.service.servises.Impl;
 
+import com.dev.bookly.global.pagination.PageRequestDTO;
+import com.dev.bookly.global.pagination.PageResponseDTO;
+import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.service.domain.Resource;
 import com.dev.bookly.service.domain.Service;
 import com.dev.bookly.service.dtos.ResourceMapper;
-import com.dev.bookly.service.dtos.ServiceMapper;
 import com.dev.bookly.service.dtos.requests.ResourceRequestDTO;
 import com.dev.bookly.service.dtos.requests.ServiceRequestDTO;
 import com.dev.bookly.service.dtos.responses.ResourceResponseDTO;
@@ -12,6 +14,9 @@ import com.dev.bookly.service.exceptions.resourcesExceptions.DuplicateResourceEx
 import com.dev.bookly.service.exceptions.resourcesExceptions.InvalidCapacityException;
 import com.dev.bookly.service.exceptions.resourcesExceptions.ResourceNotFoundException;
 import com.dev.bookly.service.exceptions.resourcesExceptions.ValidationException;
+import com.dev.bookly.service.exceptions.servicesExceptions.DuplicatedServiceException;
+import com.dev.bookly.service.exceptions.servicesExceptions.ServiceNotFoundException;
+import com.dev.bookly.service.exceptions.servicesExceptions.ServiceValidationException;
 import com.dev.bookly.service.repositories.ResourceRepository;
 import com.dev.bookly.service.repositories.ServiceRepository;
 import com.dev.bookly.service.servises.ServiceCatalogService;
@@ -37,20 +42,34 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
     }
     @Override
     @Transactional(readOnly = true)
-    public List<ServiceResponseDTO> listServices(Long businessId) {
-        List<Service> services = serviceRepository.findByBusiness(businessId);
-        List<ServiceResponseDTO> out = new ArrayList<>(services.size());
-        for (Service s : services) {
+    public PageResponseDTO<ServiceResponseDTO> listServices(Long businessId, PageRequestDTO pr) {
+        PageResult<Service> page = serviceRepository.findByBusiness(businessId,pr.getOffset(), pr.getSize());
+        List<ServiceResponseDTO> out = new ArrayList<>();
+        for (Service s : page.getRows()) {
             out.add(toServiceDTO(s));
         }
-        return out;
+        return new PageResponseDTO<>(
+                out,
+                pr.getPage(),
+                pr.getSize(),
+                page.getTotal()
+        );
     }
 
     @Override
     public ServiceResponseDTO createService(Long businessId, ServiceRequestDTO dto) {
+        if (dto.getName()==null || dto.getName().isBlank()){
+            throw new ServiceValidationException("invalid service name");
+        }
+        if (dto.getPrice()==null || dto.getPrice()<0){
+            throw new ServiceValidationException("invalid price");
+        }
+        if (dto.getDurationMins()<0){
+            throw new ServiceValidationException("invalid duration");
+        }
 
         if (serviceRepository.existsByName(businessId, dto.getName())) {
-            throw new IllegalStateException("Service name already exists in this business: " + dto.getName());
+            throw new DuplicatedServiceException("Service name already exists in this business: " + dto.getName());
         }
         Service toSave = toServiceDomain(null, businessId, dto);
         Service saved = serviceRepository.save(toSave);
@@ -59,18 +78,27 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
 
     @Override
     public ServiceResponseDTO updateService(Long businessId, Long serviceId, ServiceRequestDTO dto) {
+        if (dto.getName()==null || dto.getName().isBlank()){
+            throw new ServiceValidationException("invalid service name");
+        }
+        if (dto.getPrice()==null || dto.getPrice()<0){
+            throw new ServiceValidationException("invalid price");
+        }
+        if (dto.getDurationMins()<0){
+            throw new ServiceValidationException("invalid duration");
+        }
         Service current = serviceRepository.findById(serviceId);
         if (current == null) {
-            throw new IllegalStateException("Service not found: " + serviceId);
+            throw new ServiceNotFoundException("Service not found: " + serviceId);
         }
         if (!businessId.equals(current.getBusinessId())) {
-            throw new IllegalStateException("Service does not belong to business: " + businessId);
+            throw new ServiceNotFoundException("Service does not belong to business: " + businessId);
         }
 
         // If name changes, ensure no duplicate for this business
         if (!current.getName().equalsIgnoreCase(dto.getName())
                 && serviceRepository.existsByName(businessId, dto.getName())) {
-            throw new IllegalStateException("Service name already exists in this business: " + dto.getName());
+            throw new DuplicatedServiceException("Service name already exists in this business: " + dto.getName());
         }
 
         current.setName(dto.getName());
@@ -116,20 +144,26 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
 //    }
 
     @Override
-    public List<ResourceResponseDTO> listResources(Long businessId, Long servicesId, String username) {
+    public PageResponseDTO<ResourceResponseDTO> listResources(Long businessId, Long servicesId, String username,PageRequestDTO pr) {
 
-        List<Resource> resources = resourceRepository.findByServiceId(servicesId);
+        PageResult<Resource> page = resourceRepository.findByServiceId(servicesId,pr.getOffset(),pr.getSize());
 
-        if (resources.isEmpty()) {
+        if (page==null) {
             throw new ResourceNotFoundException("No resources found for serviceId: " + servicesId);
         }
 
         List<ResourceResponseDTO> resourcesDTO = new ArrayList<>();
-        for (Resource resource : resources) {
+        for (Resource resource : page.getRows()) {
             resourcesDTO.add(ResourceMapper.toResourceResponseDTO(resource));
         }
 
-        return resourcesDTO;
+        return new PageResponseDTO<>(
+                resourcesDTO,
+                pr.getPage(),
+                pr.getSize(),
+                page.getTotal()
+
+        );
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.dev.bookly.service.controllers;
 
+import com.dev.bookly.global.pagination.PageRequestDTO;
+import com.dev.bookly.global.pagination.PageResponseDTO;
 import com.dev.bookly.service.dtos.requests.ResourceRequestDTO;
 import com.dev.bookly.service.dtos.requests.ServiceRequestDTO;
 import com.dev.bookly.service.dtos.responses.ResourceResponseDTO;
@@ -28,12 +30,15 @@ public class ServiceCatalogController {
     }
 
     @GetMapping("/services")
-    public ResponseEntity<List<ServiceResponseDTO>> listServices(@PathVariable Long businessId) {
+    public ResponseEntity<PageResponseDTO<ServiceResponseDTO>> listServices(@PathVariable Long businessId, @RequestParam(defaultValue = "0") int page,
+                                                                            @RequestParam(defaultValue = "20") int size) {
+
 
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         ownershipService.userOwnsBusiness(businessId,userName);
 
-        List<ServiceResponseDTO> list = svc.listServices(businessId);
+        PageRequestDTO pr = new PageRequestDTO(page, size);
+        PageResponseDTO<ServiceResponseDTO> list = svc.listServices(businessId,pr);
         return ResponseEntity.ok(list);
     }
 
@@ -67,12 +72,15 @@ public class ServiceCatalogController {
 //    }
 
     @GetMapping("/services/{servicesId}/resources")
-    public ResponseEntity<List<ResourceResponseDTO>> listResources(@PathVariable Long businessId , @PathVariable Long servicesId) {
+    public ResponseEntity<PageResponseDTO<ResourceResponseDTO>> listResources(@PathVariable Long businessId , @PathVariable Long servicesId,
+                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "20") int size) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         ownershipService.userOwnsService(businessId , servicesId ,username);
+        PageRequestDTO pr = new PageRequestDTO(page, size);
 
-        List<ResourceResponseDTO> resources = svc.listResources(businessId , servicesId ,username);
+        PageResponseDTO<ResourceResponseDTO> resources = svc.listResources(businessId , servicesId ,username,pr);
         return new ResponseEntity<>(resources , HttpStatus.OK);
     }
 

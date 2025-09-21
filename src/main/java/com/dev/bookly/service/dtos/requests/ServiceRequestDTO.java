@@ -5,13 +5,13 @@ public class ServiceRequestDTO {
     private final String name;
     private final String description;
 
-    private final int durationMins;
+    private final Integer durationMins;
 
-    private final double price;
+    private final Double price;
 
-    private final boolean active;
+    private final Boolean active;
 
-    public ServiceRequestDTO(String name, String description, int durationMins, double price, boolean active) {
+    public ServiceRequestDTO(String name, String description, Integer durationMins, Double price, Boolean active) {
         this.name = name;
         this.description = description;
         this.durationMins = durationMins;
@@ -27,15 +27,15 @@ public class ServiceRequestDTO {
         return description;
     }
 
-    public int getDurationMins() {
+    public Integer getDurationMins() {
         return durationMins;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return active;
     }
 }
