@@ -5,6 +5,7 @@ import com.dev.bookly.global.pagination.PageResult;
 import com.dev.bookly.service.domain.Resource;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ResourceRepository {
     PageResult<Resource> findByServiceId(Long serviceId, int offset, int limit);
@@ -18,6 +19,7 @@ public interface ResourceRepository {
     Resource getResourceById(Long resourceId);
 
     boolean existsByName(String name);
+
 
 
 }
