@@ -72,7 +72,7 @@ public class ResourceShiftRepositoryMySQLImpl implements ResourceShiftRepository
                 rs.getDate("effective_to") != null ? rs.getDate("effective_to").toLocalDate() : null,
                 rs.getTimestamp("updated_at").toLocalDateTime(),
                 rs.getTimestamp("created_at").toLocalDateTime()
-        ), resourceId, (short) date.getDayOfWeek().getValue(), date, date);
+        ), resourceId, (short) date.getDayOfWeek().getValue() % 7 + 1, date, date);
     }
 
     @Override

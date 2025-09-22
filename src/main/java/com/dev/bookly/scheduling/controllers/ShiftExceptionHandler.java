@@ -47,12 +47,17 @@ public class ShiftExceptionHandler {
         //Handle when JSON is bad bean validation failed.
         //Handle when JSON is bad malformed JSON.
         //Handle when JSON is bad malformed wrong type (e.g. "abc" for dayOfWeek).
+        //Handle when the date in url is not valid
+        //Handle when the date in the past
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         if (ex instanceof AccessDeniedException) status = HttpStatus.FORBIDDEN; //Handle authorization errors when the user does not own the resource.
         else if (ex instanceof NotFoundException) status = HttpStatus.NOT_FOUND; //Handle resource not found errors.
         else if (ex instanceof OverlappingShiftException) status = HttpStatus.CONFLICT; //Handle overlapping shift errors.
         else if (ex instanceof DuplicateShiftException) status = HttpStatus.CONFLICT; //Handle when they are duplicate "resource" and "day of week" and "slot number".
+        else if (ex instanceof ShiftsNotFoundException) status = HttpStatus.NOT_FOUND; //Handle shifts not found errors.
+        else if (ex instanceof DatabaseException) status = HttpStatus.INTERNAL_SERVER_ERROR; //Handle database errors.
+        else if (ex instanceof ServiceException) status = HttpStatus.INTERNAL_SERVER_ERROR; //Handle service errors.
 
         return buildResponse(ex, ex.getErrorCode(), status, request);
     }

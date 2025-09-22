@@ -1,24 +1,23 @@
 package com.dev.bookly.scheduling.dtos;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-public class SlotDTO {
-
-    private final Instant start;
-    private final Instant end;
+public class LocalSlotDTO {
+    private final LocalDateTime start;
+    private final LocalDateTime end;
     private final int available;
 
-    public SlotDTO(Instant start, Instant end, int available) {
+    public LocalSlotDTO(LocalDateTime start, LocalDateTime end, int available) {
         this.start = start;
         this.end = end;
         this.available = available;
     }
 
-    public Instant getStart() {
+    public LocalDateTime getStart() {
         return start;
     }
 
-    public Instant getEnd() {
+    public LocalDateTime getEnd() {
         return end;
     }
 

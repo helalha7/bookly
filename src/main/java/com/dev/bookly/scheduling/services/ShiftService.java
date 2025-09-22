@@ -3,6 +3,7 @@ package com.dev.bookly.scheduling.services;
 import com.dev.bookly.scheduling.dtos.BusinessShiftDTO;
 import com.dev.bookly.scheduling.dtos.ResourceShiftDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -90,6 +91,5 @@ public interface ShiftService {
      * @param shiftId    the ID of the shift to delete
      */
     void deleteResourceShift(Long businessId , Long serviceId ,Long resourceId ,Long shiftId);
-
 
 }

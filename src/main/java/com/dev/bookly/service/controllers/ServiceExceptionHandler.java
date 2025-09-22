@@ -2,6 +2,9 @@ package com.dev.bookly.service.controllers;
 
 import com.dev.bookly.global.ExceptionResponseDTO;
 import com.dev.bookly.service.exceptions.resourcesExceptions.*;
+import com.dev.bookly.service.exceptions.servicesExceptions.DuplicatedServiceException;
+import com.dev.bookly.service.exceptions.servicesExceptions.ServiceAlreadyInUseException;
+import com.dev.bookly.service.exceptions.servicesExceptions.ServiceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +17,10 @@ import java.time.LocalDateTime;
 public class ServiceExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponseDTO> handleServiceNotFoundException(ResourceNotFoundException resourceNotFoundException , HttpServletRequest request){
+    public ResponseEntity<ExceptionResponseDTO> handleServiceNotFoundException(ServiceNotFoundException serviceNotFoundException , HttpServletRequest request){
         ExceptionResponseDTO exceptionResponseDTO = new ExceptionResponseDTO(
-                resourceNotFoundException.getMessage(),
-                "RESOURCE_NOT_FOUND",
+                serviceNotFoundException.getMessage(),
+                "SERVICE_NOT_FOUND",
                 request.getMethod(),
                 404,
                 request.getRequestURI(),
@@ -27,10 +30,10 @@ public class ServiceExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponseDTO> handleDuplicateServiceException(DuplicateResourceException duplicateResourceException , HttpServletRequest request){
+    public ResponseEntity<ExceptionResponseDTO> handleDuplicateServiceException(DuplicatedServiceException duplicatedServiceException , HttpServletRequest request){
         ExceptionResponseDTO exceptionResponseDTO = new ExceptionResponseDTO(
-                duplicateResourceException.getMessage(),
-                "RESOURCE_ALREADY_EXISTS",
+                duplicatedServiceException.getMessage(),
+                "SERVICE_ALREADY_EXISTS",
                 request.getMethod(),
                 409,
                 request.getRequestURI(),
@@ -53,10 +56,10 @@ public class ServiceExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponseDTO> handleServiceAlreadyInUseException(ResourceAlreadyInUseException resourceAlreadyInUseException , HttpServletRequest request){
+    public ResponseEntity<ExceptionResponseDTO> handleServiceAlreadyInUseException(ServiceAlreadyInUseException serviceAlreadyInUseException , HttpServletRequest request){
         ExceptionResponseDTO exceptionResponseDTO = new ExceptionResponseDTO(
-                resourceAlreadyInUseException.getMessage(),
-                "RESOURCE_ALREADY_IN_USE",
+                serviceAlreadyInUseException.getMessage(),
+                "SERVICE_ALREADY_IN_USE",
                 request.getMethod(),
                 409,
                 request.getRequestURI(),
